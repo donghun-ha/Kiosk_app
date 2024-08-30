@@ -1,27 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:kiosk_app/vm/database_handler.dart';
+import 'package:kiosk_app/view/local_order.dart';
+import 'package:kiosk_app/view/local_invent.dart';
+import 'package:kiosk_app/view/local_profile.dart';
 
-class LocalMainPage extends StatefulWidget {
+class LocalMainController extends GetxController {
+  final DatabaseHandler _databaseHandler = DatabaseHandler();
+  final RxString storeName = 'Loading...'.obs;
+  final RxInt pickupRequestCount = 0.obs;
+  final RxInt todayPickupCount = 0.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadData();
+  }
+
+  Future<void> loadData() async {
+    try {
+      await _databaseHandler.printAllOrders();
+      await _databaseHandler.checkDates();
+
+      storeName.value = await _databaseHandler.getStoreName();
+      pickupRequestCount.value = await _databaseHandler.getPickupRequestCount();
+      todayPickupCount.value = await _databaseHandler.getTodayPickupCount();
+    } catch (e) {
+      print('Error loading data: $e');
+    }
+  }
+}
+
+class LocalMainPage extends GetView<LocalMainController> {
   const LocalMainPage({super.key});
 
   @override
-  _LocalMainPageState createState() => _LocalMainPageState();
-}
-
-class _LocalMainPageState extends State<LocalMainPage> {
-  final DatabaseHandler _databaseHandler = DatabaseHandler();
-  String _storeName = 'Loading...';
-  int _pickupRequestCount = 0;
-  int _todayPickupCount = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.put(LocalMainController());
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shoes Maker'),
@@ -30,7 +46,10 @@ class _LocalMainPageState extends State<LocalMainPage> {
           IconButton(
             icon: const Icon(Icons.account_circle),
             onPressed: () {
-              Navigator.pushNamed(context, '/local_profile');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LocalProfilePage()),
+              );
             },
           ),
         ],
@@ -39,8 +58,7 @@ class _LocalMainPageState extends State<LocalMainPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SizedBox(height: 70),
-            // 대시보드
+            SizedBox(height: 30),
             Container(
               width: 350,
               height: 400,
@@ -54,16 +72,16 @@ class _LocalMainPageState extends State<LocalMainPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      _storeName,
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                    ),
+                    Obx(() => Text(
+                          controller.storeName.value,
+                          style: TextStyle(
+                              fontSize: 34, fontWeight: FontWeight.bold),
+                        )),
                     SizedBox(height: 76),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[200], // 연한 회색 배경
-                        borderRadius: BorderRadius.circular(8), // 모서리를 둥글게
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
                         children: [
@@ -74,14 +92,16 @@ class _LocalMainPageState extends State<LocalMainPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text('픽업 신청', style: TextStyle(fontSize: 18)),
-                                Text('$_pickupRequestCount 건',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold)),
+                                Obx(() => Text(
+                                      '${controller.pickupRequestCount.value} 건',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    )),
                               ],
                             ),
                           ),
-                          Divider(height: 1, color: Colors.grey[400]), // 구분선 추가
+                          Divider(height: 1, color: Colors.grey[400]),
                           Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 12),
@@ -89,10 +109,12 @@ class _LocalMainPageState extends State<LocalMainPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text('당일 픽업', style: TextStyle(fontSize: 18)),
-                                Text('$_todayPickupCount 건',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold)),
+                                Obx(() => Text(
+                                      '${controller.todayPickupCount.value} 건',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    )),
                               ],
                             ),
                           ),
@@ -104,13 +126,15 @@ class _LocalMainPageState extends State<LocalMainPage> {
               ),
             ),
             const SizedBox(height: 30),
-            // 버튼 row
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildSquareButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/local_order');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LocalOrderPage()),
+                    );
                   },
                   text: '주문 내역',
                   icon: Icons.list_alt,
@@ -119,7 +143,11 @@ class _LocalMainPageState extends State<LocalMainPage> {
                 const SizedBox(width: 20),
                 _buildSquareButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/local_invent');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => LocalInventPage()),
+                    );
                   },
                   text: '상품 재고',
                   icon: Icons.inventory,
@@ -133,30 +161,6 @@ class _LocalMainPageState extends State<LocalMainPage> {
     );
   }
 
-  Future<void> _loadData() async {
-    try {
-      await _databaseHandler.printAllOrders(); // 모든 주문 출력
-      await _databaseHandler.checkDates(); // 날짜 확인
-
-      final storeName = await _databaseHandler.getStoreName();
-      final pickupRequestCount = await _databaseHandler.getPickupRequestCount();
-      final todayPickupCount = await _databaseHandler.getTodayPickupCount();
-
-      print('Store Name: $storeName');
-      print('Pickup Request Count: $pickupRequestCount');
-      print('Today Pickup Count: $todayPickupCount');
-
-      setState(() {
-        _storeName = storeName;
-        _pickupRequestCount = pickupRequestCount;
-        _todayPickupCount = todayPickupCount;
-      });
-    } catch (e) {
-      print('Error loading data: $e');
-      // 에러 처리 (예: 사용자에게 알림)
-    }
-  }
-
   Widget _buildSquareButton({
     required VoidCallback onPressed,
     required String text,
@@ -164,14 +168,14 @@ class _LocalMainPageState extends State<LocalMainPage> {
     required Color color,
   }) {
     return SizedBox(
-      width: 140, // 버튼의 너비
-      height: 140, // 버튼의 높이
+      width: 140,
+      height: 140,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Color(0XFF3A895F),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20), // 모서리를 둥글게
+            borderRadius: BorderRadius.circular(20),
           ),
           padding: EdgeInsets.all(20),
         ),

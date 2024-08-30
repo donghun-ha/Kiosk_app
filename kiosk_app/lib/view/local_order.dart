@@ -1,53 +1,63 @@
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
 import 'package:kiosk_app/vm/database_handler.dart';
+import 'package:kiosk_app/view/local_order_detail.dart';
+import 'package:kiosk_app/view/local_profile.dart';
 
-class LocalOrderPage extends StatefulWidget {
-  const LocalOrderPage({super.key});
-
-  @override
-  State<LocalOrderPage> createState() => _LocalOrderPageState();
-}
-
-class _LocalOrderPageState extends State<LocalOrderPage> {
+class LocalOrderController extends GetxController {
   final DatabaseHandler _databaseHandler = DatabaseHandler();
-  final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> _allOrders = [];
-  List<Map<String, dynamic>> _filteredOrders = [];
+  final TextEditingController searchController = TextEditingController();
+  final RxList<Map<String, dynamic>> allOrders = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> filteredOrders =
+      <Map<String, dynamic>>[].obs;
+  final RxBool isLoading = true.obs;
 
   @override
-  void initState() {
-    super.initState();
-    _loadOrders();
+  void onInit() {
+    super.onInit();
+    loadOrders();
   }
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
   }
 
-  Future<void> _loadOrders() async {
-    final orders = await _databaseHandler.getOrders();
-    setState(() {
-      _allOrders = orders;
-      _filteredOrders = [];
-    });
+  Future<void> loadOrders() async {
+    isLoading.value = true;
+    try {
+      final orders = await _databaseHandler.getOrders();
+      allOrders.value = orders;
+      filteredOrders.value = orders;
+    } catch (e) {
+      print('Error loading orders: $e');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void _filterOrders() {
-    setState(() {
-      _filteredOrders = _allOrders.where((order) {
+  void filterOrders() {
+    if (searchController.text.isEmpty) {
+      filteredOrders.value = allOrders;
+    } else {
+      filteredOrders.value = allOrders.where((order) {
         return order['customer_id']
             .toString()
             .toLowerCase()
-            .contains(_searchController.text.toLowerCase());
+            .contains(searchController.text.toLowerCase());
       }).toList();
-    });
+    }
   }
+}
+
+class LocalOrderPage extends GetView<LocalOrderController> {
+  const LocalOrderPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(LocalOrderController());
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFF0FFF5),
@@ -55,7 +65,12 @@ class _LocalOrderPageState extends State<LocalOrderPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.account_circle),
-            onPressed: () => Navigator.pushNamed(context, '/local_profile'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LocalProfilePage()),
+              );
+            },
           ),
         ],
       ),
@@ -64,7 +79,7 @@ class _LocalOrderPageState extends State<LocalOrderPage> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
-              controller: _searchController,
+              controller: controller.searchController,
               decoration: InputDecoration(
                 labelText: '회원 ID 검색',
                 border: OutlineInputBorder(
@@ -72,35 +87,41 @@ class _LocalOrderPageState extends State<LocalOrderPage> {
                 ),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.search),
-                  onPressed: _filterOrders,
+                  onPressed: controller.filterOrders,
                 ),
                 filled: true,
                 fillColor: Colors.grey[200],
               ),
-              onSubmitted: (_) => _filterOrders(),
+              onSubmitted: (_) => controller.filterOrders(),
             ),
           ),
           Expanded(
-            child: _searchController.text.isEmpty
-                ? const Center(child: Text('회원 ID를 검색하세요.'))
-                : _filteredOrders.isEmpty
-                    ? const Center(child: Text('검색 결과가 없습니다.'))
-                    : ListView.builder(
-                        itemCount: _filteredOrders.length,
-                        itemBuilder: (context, index) {
-                          final order = _filteredOrders[index];
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                '/local_order_detail',
-                                arguments: order['id'],
-                              );
-                            },
-                            child: OrderCard(order: order),
-                          );
-                        },
-                      ),
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (controller.filteredOrders.isEmpty) {
+                return const Center(child: Text('검색 결과가 없습니다.'));
+              } else {
+                return ListView.builder(
+                  itemCount: controller.filteredOrders.length,
+                  itemBuilder: (context, index) {
+                    final order = controller.filteredOrders[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                LocalOrderDetailPage(orderId: order['id']),
+                          ),
+                        );
+                      },
+                      child: OrderCard(order: order),
+                    );
+                  },
+                );
+              }
+            }),
           ),
         ],
       ),
@@ -111,7 +132,7 @@ class _LocalOrderPageState extends State<LocalOrderPage> {
 class OrderCard extends StatelessWidget {
   final Map<String, dynamic> order;
 
-  const OrderCard({super.key, required this.order});
+  const OrderCard({Key? key, required this.order}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,84 +1,85 @@
 import 'dart:typed_data';
 import 'dart:io' if (dart.library.html) 'dart:html';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kiosk_app/vm/database_handler.dart';
 
-class LocalModifyPage extends StatefulWidget {
-  @override
-  _LocalModifyPageState createState() => _LocalModifyPageState();
-}
-
-class _LocalModifyPageState extends State<LocalModifyPage> {
+class LocalModifyController extends GetxController {
   final DatabaseHandler _databaseHandler = DatabaseHandler();
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
-  XFile? _image;
+  final formKey = GlobalKey<FormState>();
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final Rx<XFile?> image = Rx<XFile?>(null);
 
   @override
-  void initState() {
-    super.initState();
-    _loadUserData();
+  void onInit() {
+    super.onInit();
+    loadUserData();
   }
 
-  Future<void> _loadUserData() async {
+  Future<void> loadUserData() async {
     final user = await _databaseHandler.getCurrentUser();
-    _nameController.text = user['name'];
-    _phoneController.text = user['phone'];
+    nameController.text = user['name'];
+    phoneController.text = user['phone'];
   }
 
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _image = image;
-      });
+  Future<void> pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage =
+        await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      image.value = pickedImage;
     }
   }
 
-  Future<void> _updateProfile() async {
-    if (_formKey.currentState!.validate()) {
+  Future<void> updateProfile() async {
+    if (formKey.currentState!.validate()) {
       Uint8List? imageBytes;
-      if (_image != null) {
-        imageBytes = await _image!.readAsBytes();
+      if (image.value != null) {
+        imageBytes = await image.value!.readAsBytes();
       }
       await _databaseHandler.updateUserProfile(
-        name: _nameController.text,
-        phone: _phoneController.text,
+        name: nameController.text,
+        phone: phoneController.text,
         image: imageBytes,
       );
-      Navigator.pop(context);
+      Get.back();
     }
   }
+}
 
+class LocalModifyPage extends GetView<LocalModifyController> {
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(LocalModifyController());
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFF0FFF5),
         title: Text('프로필 수정'),
       ),
       body: Form(
-        key: _formKey,
+        key: controller.formKey,
         child: ListView(
           padding: EdgeInsets.all(16),
           children: [
             GestureDetector(
-              onTap: _pickImage,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: _image != null
-                    ? kIsWeb
-                        ? NetworkImage(_image!.path)
-                        : FileImage(File(_image!.path)) as ImageProvider
-                    : AssetImage('assets/default_profile.png') as ImageProvider,
-              ),
+              onTap: controller.pickImage,
+              child: Obx(() => CircleAvatar(
+                    radius: 50,
+                    backgroundImage: controller.image.value != null
+                        ? kIsWeb
+                            ? NetworkImage(controller.image.value!.path)
+                            : FileImage(File(controller.image.value!.path))
+                                as ImageProvider
+                        : AssetImage('assets/default_profile.png')
+                            as ImageProvider,
+                  )),
             ),
             SizedBox(height: 20),
             TextFormField(
-              controller: _nameController,
+              controller: controller.nameController,
               decoration: InputDecoration(labelText: '이름'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -88,7 +89,7 @@ class _LocalModifyPageState extends State<LocalModifyPage> {
               },
             ),
             TextFormField(
-              controller: _phoneController,
+              controller: controller.phoneController,
               decoration: InputDecoration(labelText: '휴대폰 번호'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -99,14 +100,12 @@ class _LocalModifyPageState extends State<LocalModifyPage> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/local_password');
-              },
+              onPressed: () => Get.toNamed('/local_password'),
               child: Text('비밀번호 변경'),
             ),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _updateProfile,
+              onPressed: controller.updateProfile,
               child: Text('프로필 수정'),
             ),
           ],

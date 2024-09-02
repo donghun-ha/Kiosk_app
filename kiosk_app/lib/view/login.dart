@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kiosk_app/model/global.dart';
 import 'package:kiosk_app/view/co_main.dart';
+import 'package:kiosk_app/view/customer_maintabbar.dart';
+import 'package:kiosk_app/view/kiosk_order.dart';
+import 'package:kiosk_app/view/local_main.dart';
+import 'package:kiosk_app/view/sign.dart';
+import 'package:kiosk_app/vm/database_handler.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -10,14 +16,18 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  late DatabaseHandler handler;
   late TextEditingController idController;
-  late TextEditingController passwordCotroller;
+  late TextEditingController passwordController;
+  late String checkid;
 
   @override
   void initState() {
     super.initState();
+    handler = DatabaseHandler();
     idController = TextEditingController();
-    passwordCotroller = TextEditingController();
+    passwordController = TextEditingController();
+    checkid = '';
   }
 
   @override
@@ -93,13 +103,14 @@ class _LoginState extends State<Login> {
           Padding(
             padding: const EdgeInsets.fromLTRB(30, 5, 30, 20),
             child: TextField(
-              controller: passwordCotroller,
+              controller: passwordController,
               decoration: const InputDecoration(border: OutlineInputBorder()),
+              obscureText: true,
             ),
           ),
           ElevatedButton(
             onPressed: () {
-              //
+              handleLogin();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
@@ -128,7 +139,9 @@ class _LoginState extends State<Login> {
               ),
               TextButton(
                 onPressed: () {
-                  //
+                  Get.to(const Sign());
+                  idController.clear();
+                  passwordController.clear();
                 },
                 child: const Text(
                   '회원가입',
@@ -142,8 +155,9 @@ class _LoginState extends State<Login> {
           ),
           TextButton(
             onPressed: () {
-              Get.to(const CoMain());
-              // 작업용 본사 메인페이지 보내기용 추후 변경 예정.
+              kioskLogin();
+              idController.clear();
+              passwordController.clear();
             },
             child: const Text(
               'Kiosk Login',
@@ -157,4 +171,68 @@ class _LoginState extends State<Login> {
       ),
     );
   }
-}
+
+  // --- Funtions ---
+  handleLogin() async {
+    if (idController.text.trim() == 'main' &&
+        passwordController.text.trim() == 'qwer1234') {
+      Get.to(const CoMain());
+      idController.clear();
+      passwordController.clear();
+      return;
+    }
+    if (idController.text.trim() == 'store001' &&
+        passwordController.text.trim() == 'qwer1234') {
+      Get.to(const LocalMain());
+      idController.clear();
+      passwordController.clear();
+      return;
+    }
+
+    // 고객 계정 확인
+    final customer = await handler.fetchCustomerByIdAndPassword(
+      idController.text.trim(),
+      passwordController.text.trim(),
+    );
+
+    if (customer != null) {
+      // 고객 정보가 존재하면 고객용 페이지로 이동
+      Get.to(const CustomerMaintabbar());
+      checkId = idController.text.trim();
+      idController.clear();
+      passwordController.clear();
+    } else {
+      // 로그인 실패 시 오류 메시지 표시
+      Get.snackbar(
+        "로그인 실패",
+        "아이디 또는 비밀번호가 잘못되었습니다.",
+        snackPosition: SnackPosition.TOP,
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
+  kioskLogin() async {
+    final customer = await handler.fetchCustomerByIdAndPassword(
+      idController.text.trim(),
+      passwordController.text.trim(),
+    );
+
+    if (customer != null) {
+      // 고객 정보가 존재하면 고객용 페이지로 이동
+      Get.to(const KioskOrder());
+      idController.clear();
+      passwordController.clear();
+    } else {
+      // 로그인 실패 시 오류 메시지 표시
+      Get.snackbar(
+        "로그인 실패",
+        "아이디 또는 비밀번호가 잘못되었습니다.",
+        snackPosition: SnackPosition.TOP,
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+}// End

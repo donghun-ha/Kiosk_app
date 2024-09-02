@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kiosk_app/model/global.dart';
 import 'package:kiosk_app/model/orders.dart';
 import 'package:kiosk_app/vm/database_handler.dart';
 
@@ -36,14 +37,15 @@ class _CustomerProductState extends State<CustomerProduct> {
     count = 1;
     addColor();
   }
-  addColor(){
-    for(int i = 0; i < 11; i++){
+
+  addColor() {
+    for (int i = 0; i < 11; i++) {
       colorLinelist.add(Colors.white);
     }
-    for(int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++) {
       shoeLineColor.add(Colors.white);
     }
-    for(int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++) {
       localLineColor.add(Colors.white);
     }
   }
@@ -59,7 +61,7 @@ class _CustomerProductState extends State<CustomerProduct> {
               Container(
                   width: 400,
                   height: 380,
-                  color: Color(0xffEBE8E8),
+                  color: const Color(0xffEBE8E8),
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -67,38 +69,42 @@ class _CustomerProductState extends State<CustomerProduct> {
                         Image.memory(
                           value[0],
                           width: 500,
-                          )
-                        ],
+                        )
+                      ],
                     ),
                   )),
               Column(
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
+                        Row(
                           children: [
-                            Row(
+                            Column(
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(10, 15, 8, 15),
-                                  child: Text(
-                                    value[1],
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold, fontSize: 25),
-                                  ),
-                                ),
-                                Column(
+                                Row(
                                   children: [
-                                    SizedBox(
-                                      width: 10,
-                                      height: 9,
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 15, 8, 15),
+                                      child: Text(
+                                        value[1],
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 25),
+                                      ),
                                     ),
-                                    Text(
-                                      value[3],
-                                      style: TextStyle(),
+                                    Column(
+                                      children: [
+                                        const SizedBox(
+                                          width: 10,
+                                          height: 9,
+                                        ),
+                                        Text(
+                                          value[3],
+                                          style: const TextStyle(),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -106,48 +112,45 @@ class _CustomerProductState extends State<CustomerProduct> {
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                  onPressed: () {
-                                    if(count == 1){
-                                    }else {
-                                      count --;
-                                      setState(() {});
-                                    }
-                                  },
-                                  icon: Icon(
-                                    Icons.remove_circle,
-                                    color: Colors.black,
-                                    )),
-                              Text(
-                                '$count',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20
-                                ),
-                                ),
-                              IconButton(
-                                  onPressed: () {
-                                    count++;
-                                    setState(() {});
-                                  },
-                                  icon: Icon(
-                                    Icons.add_circle,
-                                    color: Colors.black,
-                                  )),
-                            ],
-                          ),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                      onPressed: () {
+                                        if (count == 1) {
+                                        } else {
+                                          count--;
+                                          setState(() {});
+                                        }
+                                      },
+                                      icon: const Icon(
+                                        Icons.remove_circle,
+                                        color: Colors.black,
+                                      )),
+                                  Text(
+                                    '$count',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20),
+                                  ),
+                                  IconButton(
+                                      onPressed: () {
+                                        count++;
+                                        setState(() {});
+                                      },
+                                      icon: const Icon(
+                                        Icons.add_circle,
+                                        color: Colors.black,
+                                      )),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ]),
+                      ]),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -155,19 +158,18 @@ class _CustomerProductState extends State<CustomerProduct> {
                         padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
                         child: Text(
                           '${value[2]}',
-                          style: TextStyle(
-                            color: Color(0xffDCB21C),
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold
-                          ),
-                          ),
+                          style: const TextStyle(
+                              color: Color(0xffDCB21C),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ],
                   ),
-                  Row(
+                  const Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                        padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
                         child: Text(
                           '사이즈 선택',
                           style: TextStyle(
@@ -178,63 +180,61 @@ class _CustomerProductState extends State<CustomerProduct> {
                   ),
                   Row(
                     children: [
-                      Container(
+                      SizedBox(
                         height: 45,
                         width: 390,
                         child: FutureBuilder(
                           future: handler.quaryProductsize(value[1]), //////
                           builder: (context, snapshot) {
-                            if(snapshot.hasData){
+                            if (snapshot.hasData) {
                               return ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                                return Padding(
-                                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    selectBox(index, snapshot.data!.length);
-                                    selectSize = snapshot.data![index].id;
-                                    price = snapshot.data![index].price;
-                                  },
-                                  child: Container(
-                                    width: 80,
-                                    height: 45,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                          color: colorLinelist[index],
-                                          width: 2.0
-                                        )
+                                scrollDirection: Axis.horizontal,
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        selectBox(index, snapshot.data!.length);
+                                        selectSize = snapshot.data![index].id;
+                                        price = snapshot.data![index].price;
+                                      },
+                                      child: Container(
+                                        width: 80,
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            color: Colors.white,
+                                            border: Border.all(
+                                                color: colorLinelist[index],
+                                                width: 2.0)),
+                                        child: Center(
+                                          child: Text(
+                                              '${snapshot.data![index].size}'),
                                         ),
-                                        
-                                    child: Center(
-                                      child: Text('${snapshot.data![index].size}'),
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               );
-                              
-                            },
-                          );
-                            }else {
-                              return Center(
+                            } else {
+                              return const Center(
                                 child: CircularProgressIndicator(),
                               );
                             }
-                            
                           },
                         ),
                       ),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
                           child: Text(
                             '색상 선택',
                             style: TextStyle(
@@ -246,58 +246,59 @@ class _CustomerProductState extends State<CustomerProduct> {
                   ),
                   Row(
                     children: [
-                      Container(
+                      SizedBox(
                         height: 45,
                         width: 390,
                         child: FutureBuilder(
                           future: handler.quaryProductsize(value[1]),
                           builder: (context, snapshot) {
-                            if(snapshot.hasData){
+                            if (snapshot.hasData) {
                               return ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    selectColorBox(index, snapshot.data!.length);
-                                  },
-                                  child: Container(
-                                    width: 80,
-                                    height: 45,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                          color: shoeLineColor[index],
-                                          width: 2.0
-                                        )
+                                scrollDirection: Axis.horizontal,
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        selectColorBox(
+                                            index, snapshot.data!.length);
+                                      },
+                                      child: Container(
+                                        width: 80,
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            color: Colors.white,
+                                            border: Border.all(
+                                                color: shoeLineColor[index],
+                                                width: 2.0)),
+                                        child: Center(
+                                          child:
+                                              Text(snapshot.data![index].color),
                                         ),
-                                    child: Center(
-                                      child: Text(snapshot.data![index].color),
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               );
-                            },
-                          );
-                            } else{
-                              return Center(
-                                child: CircularProgressIndicator()
-                              );
+                            } else {
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
                           },
                         ),
                       ),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
                           child: Text(
                             '지점 선택',
                             style: TextStyle(
@@ -309,47 +310,49 @@ class _CustomerProductState extends State<CustomerProduct> {
                   ),
                   Row(
                     children: [
-                      Container(
+                      SizedBox(
                         height: 45,
                         width: 390,
                         child: FutureBuilder(
                           future: handler.quaryStore(),
                           builder: (context, snapshot) {
-                            if(snapshot.hasData){
+                            if (snapshot.hasData) {
                               return ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    selectLocalBox(index, snapshot.data!.length);
-                                    selectLocalname = snapshot.data![index].id;
-                                  },
-                                  child: Container(
-                                    width: 80,
-                                    height: 45,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                          color: localLineColor[index],
-                                          width: 2.0
-                                        )
+                                scrollDirection: Axis.horizontal,
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        selectLocalBox(
+                                            index, snapshot.data!.length);
+                                        selectLocalname =
+                                            snapshot.data![index].id;
+                                      },
+                                      child: Container(
+                                        width: 80,
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            color: Colors.white,
+                                            border: Border.all(
+                                                color: localLineColor[index],
+                                                width: 2.0)),
+                                        child: Center(
+                                          child:
+                                              Text(snapshot.data![index].name),
                                         ),
-                                    child: Center(
-                                      child: Text(snapshot.data![index].name),
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               );
-                            },
-                          );
-                            } else{
-                              return Center(
-                                child: CircularProgressIndicator()
-                              );
+                            } else {
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
                           },
                         ),
@@ -362,37 +365,29 @@ class _CustomerProductState extends State<CustomerProduct> {
                       width: 300,
                       height: 45,
                       child: ElevatedButton(
-                        onPressed: () async{
-                          print(selectSize);
-                          print(count);
-                          print(selectLocalname);
-                          Orders orders = Orders(
-                            customer_id: 'bowwow67', 
-                            product_id: selectSize, 
-                            store_id: selectLocalname,
-                            quantity: count, 
-                            total_price: price * count,
-                            state: '결제전'
-                            );
+                          onPressed: () async {
+                            Orders orders = Orders(
+                                customer_id: checkId,
+                                product_id: selectSize,
+                                store_id: selectLocalname,
+                                quantity: count,
+                                total_price: price * count,
+                                state: '결제전');
                             await handler.insertOrders(orders);
                             Get.back();
                             setState(() {});
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xff6644AB),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)
-                          )
-                        ),
-                        child: Text(
-                          'Add to Cart',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20
-                          ),
-                          )
-                        ),
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xff6644AB),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10))),
+                          child: const Text(
+                            'Add to Cart',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          )),
                     ),
                   )
                 ],
@@ -404,10 +399,10 @@ class _CustomerProductState extends State<CustomerProduct> {
     );
   }
 
-
   // ---Function---
   selectBox(index, list) {
-    for(int i = 0; i < list; i++){  // 버튼을 누르면 먼저 모두 노랑색으로 바꾸고 선택한것을 빨간색으로 바꾸면 중복선택이 안된다.
+    for (int i = 0; i < list; i++) {
+      // 버튼을 누르면 먼저 모두 노랑색으로 바꾸고 선택한것을 빨간색으로 바꾸면 중복선택이 안된다.
       colorLinelist[i] = Colors.white;
     }
 
@@ -415,8 +410,9 @@ class _CustomerProductState extends State<CustomerProduct> {
     setState(() {});
   }
 
-    selectColorBox(index, list) {
-    for(int i = 0; i < list; i++){  // 버튼을 누르면 먼저 모두 노랑색으로 바꾸고 선택한것을 빨간색으로 바꾸면 중복선택이 안된다.
+  selectColorBox(index, list) {
+    for (int i = 0; i < list; i++) {
+      // 버튼을 누르면 먼저 모두 노랑색으로 바꾸고 선택한것을 빨간색으로 바꾸면 중복선택이 안된다.
       shoeLineColor[i] = Colors.white;
     }
 
@@ -425,13 +421,12 @@ class _CustomerProductState extends State<CustomerProduct> {
   }
 
   selectLocalBox(index, list) {
-    for(int i = 0; i < list; i++){  // 버튼을 누르면 먼저 모두 노랑색으로 바꾸고 선택한것을 빨간색으로 바꾸면 중복선택이 안된다.
+    for (int i = 0; i < list; i++) {
+      // 버튼을 누르면 먼저 모두 노랑색으로 바꾸고 선택한것을 빨간색으로 바꾸면 중복선택이 안된다.
       localLineColor[i] = Colors.white;
     }
 
     localLineColor[index] = Colors.black;
     setState(() {});
   }
-
-
 } // End

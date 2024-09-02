@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kiosk_app/model/global.dart';
 import 'package:kiosk_app/view/co_main.dart';
+import 'package:kiosk_app/view/customer_maintabbar.dart';
 import 'package:kiosk_app/view/kiosk_order.dart';
 import 'package:kiosk_app/view/local_main.dart';
 import 'package:kiosk_app/view/sign.dart';
@@ -17,6 +19,7 @@ class _LoginState extends State<Login> {
   late DatabaseHandler handler;
   late TextEditingController idController;
   late TextEditingController passwordController;
+  late String checkid;
 
   @override
   void initState() {
@@ -24,6 +27,7 @@ class _LoginState extends State<Login> {
     handler = DatabaseHandler();
     idController = TextEditingController();
     passwordController = TextEditingController();
+    checkid = '';
   }
 
   @override
@@ -193,7 +197,8 @@ class _LoginState extends State<Login> {
 
     if (customer != null) {
       // 고객 정보가 존재하면 고객용 페이지로 이동
-      Get.to(const LocalMain());
+      Get.to(const CustomerMaintabbar());
+      checkId = idController.text.trim();
       idController.clear();
       passwordController.clear();
     } else {

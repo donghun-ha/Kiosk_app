@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kiosk_app/model/product.dart';
-
-import 'vm/database_handler.dart';
+import 'package:kiosk_app/vm/database_handler.dart';
 
 class Testinsert extends StatefulWidget {
   const Testinsert({super.key});
@@ -42,6 +41,7 @@ class _TestinsertState extends State<Testinsert> {
     priceController = TextEditingController();
     brandController = TextEditingController();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,32 +99,29 @@ class _TestinsertState extends State<Testinsert> {
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: ElevatedButton(
-                    onPressed: () {
-                      getImageFromGallery(ImageSource.gallery);
-                    },
-                    child: const Text('Gallery')
-                    ),
+                      onPressed: () {
+                        getImageFromGallery(ImageSource.gallery);
+                      },
+                      child: const Text('Gallery')),
                 ),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 200,
-                    color: Colors.grey,
-                    child: Center(
-                      child: imageFile == null
-                      ? const Text('image is not selected')
-                      : Image.file(File(imageFile!.path))
-                      ,
-                    ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 200,
+                  color: Colors.grey,
+                  child: Center(
+                    child: imageFile == null
+                        ? const Text('image is not selected')
+                        : Image.file(File(imageFile!.path)),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: ElevatedButton(
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: ElevatedButton(
                       onPressed: () {
                         insertAction();
                       },
-                      child: const Text('입력')
-                      ),
-                  )
+                      child: const Text('입력')),
+                )
               ],
             ),
           ),
@@ -133,54 +130,51 @@ class _TestinsertState extends State<Testinsert> {
     );
   }
 
-
   // ---Function---
   // 외부의 갤러리 이기 때문에 async를 써준다.
-  Future getImageFromGallery(ImageSource imageSource) async{
+  Future getImageFromGallery(ImageSource imageSource) async {
     final XFile? pickedFile = await picker.pickImage(source: imageSource);
-    if(pickedFile == null){
+    if (pickedFile == null) {
       return;
-    }else {
+    } else {
       imageFile = XFile(pickedFile.path);
       setState(() {});
     }
   }
 
-  Future insertAction()async{
+  Future insertAction() async {
     // File Type을 Byte Type으로 변환하기
     File imageFile1 = File(imageFile!.path);
     Uint8List getImage = await imageFile1.readAsBytes();
 
     var productInsert = Product(
-      id: idController.text.trim(),
-      name: nameController.text.trim(),
-      size: int.parse(sizeController.text.trim()),
-      color: colorController.text.trim(),
-      stock: int.parse(stockController.text.trim()),
-      price: int.parse(priceController.text.trim()),
-      brand: brandController.text.trim(),
-      image: getImage
-      );
-      int result = await handler.insertproduct(productInsert);
-      if(result != 0){
-        _showDialog();
-      }
+        id: idController.text.trim(),
+        name: nameController.text.trim(),
+        size: int.parse(sizeController.text.trim()),
+        color: colorController.text.trim(),
+        stock: int.parse(stockController.text.trim()),
+        price: int.parse(priceController.text.trim()),
+        brand: brandController.text.trim(),
+        image: getImage);
+    int result = await handler.insertproduct(productInsert);
+    if (result != 0) {
+      _showDialog();
     }
-  _showDialog(){
-        Get.defaultDialog(
-          title: '입력 결과',
-          middleText: '입력이 완료되었습니다.',
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          barrierDismissible: false,
-          actions: [
-            TextButton(
+  }
+
+  _showDialog() {
+    Get.defaultDialog(
+        title: '입력 결과',
+        middleText: '입력이 완료되었습니다.',
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        barrierDismissible: false,
+        actions: [
+          TextButton(
               onPressed: () {
                 Get.back();
                 Get.back();
               },
-              child: const Text('OK')
-              )
-          ]
-        );
-      }
+              child: const Text('OK'))
+        ]);
+  }
 } // End

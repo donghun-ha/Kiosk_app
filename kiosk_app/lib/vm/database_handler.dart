@@ -10,7 +10,6 @@ class DatabaseHandler {
     String path = await getDatabasesPath();
     return openDatabase(join(path, 'kiosk.db'), onCreate: (db, version) async {
       await db.execute("""
-            PRAGMA foreign_keys = ON;
             create table customer (
             id text primary key,
             name text,
@@ -46,12 +45,14 @@ class DatabaseHandler {
               id text primary key,
               customer_id text,
               product_id text,
+              store_id text,
               date date,
               quantity integer,
               total_price integer,
               pickup_date date,
               FOREIGN KEY(customer_id) REFERENCES customer(id),
               FOREIGN KEY(product_id) REFERENCES product(id)
+              FOREIGN KEY(store_id) REFERENCES store(id)
               );
             """);
 
@@ -67,20 +68,6 @@ class DatabaseHandler {
                 FOREIGN KEY(product_id) REFERENCES product(id)
               );
             """);
-      // await db.rawInsert("""
-      //   insert into product (id, name, size, color, stock, price, brand, image)
-      //   values ('a00001265', '나이키에어', 265, 'White', 50, 100000, 'Nike', )
-      // """);
-
-      // await db.rawInsert("""
-      //   insert into product (id, name, size, color, stock, price, brand)
-      //   values ('a00002275', '뉴발란스블랙', 275, 'Black', 20, 150000, 'New Balance')
-      // """);
-
-      // await db.rawInsert("""
-      //   insert into product (id, name, size, color, stock, price, brand)
-      //   values ('a00003265', '프로액티브', 265, 'LightGrey', 40, 130000, 'Prospecs')
-      // """);
     }, version: 1);
   }
 
@@ -151,6 +138,14 @@ class DatabaseHandler {
     return result;
   }
 
+  Future<List<Customer>> queryCustomersById(String id) async {
+    final Database db = await initiallizeDB();
+    final List<Map<String, dynamic>> queryResults =
+        await db.rawQuery('SELECT * FROM customer WHERE id = ?', [id]);
+
+    return queryResults.map((e) => Customer.fromMap(e)).toList();
+  }
+
   Future<List<Product>> queryProductByName(String searchQuery) async {
     final Database db = await initiallizeDB();
     final List<Map<String, Object?>> queryResults = await db.rawQuery(
@@ -158,5 +153,19 @@ class DatabaseHandler {
       ['%$searchQuery%'], // 검색어가 포함된 제품을 찾기 위한 조건
     );
     return queryResults.map((e) => Product.fromMap(e)).toList();
+  }
+
+  Future<Customer?> fetchCustomerByIdAndPassword(
+      String id, String password) async {
+    final Database db = await initiallizeDB();
+    final List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT * FROM customer WHERE id = ? AND password = ?',
+      [id, password],
+    );
+
+    if (result.isNotEmpty) {
+      return Customer.fromMap(result.first);
+    }
+    return null; // 고객 정보가 없으면 null 반환
   }
 }

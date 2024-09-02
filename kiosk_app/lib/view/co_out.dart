@@ -167,7 +167,8 @@ class _CoOutState extends State<CoOut> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '배송 매장: ${order.store_id ?? 'N/A'}', // 배송 매장 표시
+                                    '배송 매장: ${order.store_id}', // 배송 매장 표시
+                                    // ?? 'N/A'
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,

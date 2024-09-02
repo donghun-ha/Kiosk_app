@@ -23,7 +23,7 @@ class Product {
   Product.fromMap(Map<String, dynamic> res)
       : id = res['id'],
         name = res['name'],
-        size = res['size'],
+        size = int.parse(res['size']), // 오류 수정
         color = res['color'],
         stock = res['stock'],
         price = res['price'],

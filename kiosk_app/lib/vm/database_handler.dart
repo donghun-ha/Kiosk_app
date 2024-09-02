@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -77,19 +80,19 @@ class DatabaseHandler {
 
   Future<int> insertStore(Store store) async {
     final Database db = await initializeDB();
-	
-	// ----승현 형님 insertStore----
+
+    // ----승현 형님 insertStore----
     return await db.insert('store', store.toMap());
   }
 
   Future<List<Map<String, dynamic>>> getOrders() async {
     final db = await initializeDB();
     return await db.query('orders', orderBy: 'date DESC');
-	// --------------------------
-    return await db.rawInsert("""
-        INSERT INTO store (id, name, address)
-        VALUES (?, ?, ?)
-      """, [store.id, store.name, store.address]);
+    // --------------------------
+    // return await db.rawInsert("""
+    //     INSERT INTO store (id, name, address)
+    //     VALUES (?, ?, ?)
+    //   """, [store.id, store.name, store.address]);
   }
 
   Future<List<Product>> queryProduct() async {
@@ -130,12 +133,12 @@ class DatabaseHandler {
     ]);
   }
 
-  Future<List<Product>> queryProductByName(String name) async {
-    final Database db = await initializeDB();
-    final List<Map<String, Object?>> queryResult = await db
-        .rawQuery('SELECT * FROM product WHERE name = ? ORDER BY size', [name]);
-    return queryResult.map((e) => Product.fromMap(e)).toList();
-  }
+  // Future<List<Product>> queryProductByName(String name) async {
+  //   final Database db = await initializeDB();
+  //   final List<Map<String, Object?>> queryResult = await db
+  //       .rawQuery('SELECT * FROM product WHERE name = ? ORDER BY size', [name]);
+  //   return queryResult.map((e) => Product.fromMap(e)).toList();
+  // }
 
   Future<List<Store>> queryStore() async {
     final Database db = await initializeDB();
@@ -148,7 +151,7 @@ class DatabaseHandler {
     final Database db = await initializeDB();
     return await db.rawInsert("""
         INSERT INTO orders (customer_id, product_id, store_id, date, quantity, total_price, pickup_date, state)
-        VALUES (?, ?, ?, date('now'), ?, ?, date('now', '+7 days'), ?)
+        VALUES (?, ?, ?, date('now'), ?, ?, date('now', '+7 days'), ?, ?)
       """, [
       order.customer_id,
       order.product_id,
@@ -183,20 +186,6 @@ class DatabaseHandler {
       """, [id]);
   }
 
-  Future<Customer?> fetchCustomerByIdAndPassword(
-      String id, String password) async {
-    final Database db = await initializeDB();
-    final List<Map<String, dynamic>> result = await db.rawQuery(
-      'SELECT * FROM customer WHERE id = ? AND password = ?',
-      [id, password],
-    );
-
-    if (result.isNotEmpty) {
-      return Customer.fromMap(result.first);
-    }
-    return null; // 고객 정보가 없으면 null 반환
-  }
-
   Future<List<Customer>> queryCustomersById(String id) async {
     final Database db = await initializeDB();
     final List<Map<String, dynamic>> queryResults =
@@ -205,26 +194,7 @@ class DatabaseHandler {
     return queryResults.map((e) => Customer.fromMap(e)).toList();
   }
 
-  Future<int> insertproduct(Product product) async {
-    int result = 0;
-    final Database db = await initializeDB();
-    result = await db.rawInsert("""
-        insert into product (id, name, size, color, stock, price, brand,image)
-        values(?,?,?,?,?,?,?,?)
-      """, [
-      product.id,
-      product.name,
-      product.size,
-      product.color,
-      product.stock,
-      product.price,
-      product.brand,
-      product.image
-    ]);
-    return result;
-  }
-
-	// ---- 승현+정영 ----
+  // ---- 승현+정영 ----
   Future<Map<String, dynamic>> getCurrentUser() async {
     final db = await initializeDB();
     final List<Map<String, dynamic>> result =
@@ -287,72 +257,6 @@ class DatabaseHandler {
     return queryResults.map((e) => Product.fromMap(e)).toList();
   }
 
-	// ---- 정영+승현 ----
-Future<Map<String, dynamic>> getCurrentUser() async {
-    final db = await initializeDB();
-    final List<Map<String, dynamic>> result =
-        await db.query('customer', limit: 1);
-    if (result.isNotEmpty) {
-      return result.first;
-    } else {
-      throw Exception('사용자를 찾을 수 없습니다.');
-    }
-  }
-
-  Future<void> updateUserProfile({
-    required String name,
-    required String phone,
-    Uint8List? image,
-  }) async {
-    final db = await initializeDB();
-    final Map<String, dynamic> updateData = {
-      'name': name,
-      'phone': phone,
-    };
-    if (image != null) {
-      String base64Image = base64Encode(image);
-      updateData['image'] = base64Image;
-    }
-    await db.update(
-      'customer',
-      updateData,
-      where: 'id = ?',
-      whereArgs: [1], // 현재 로그인된 사용자의 ID를 사용해야 합니다.
-    );
-  }
-
-  Future<bool> changePassword(
-      {required String currentPassword, required String newPassword}) async {
-    final db = await initializeDB();
-    final List<Map<String, dynamic>> result = await db.query(
-      'customer',
-      where: 'id = ? AND password = ?',
-      whereArgs: [1, currentPassword], // 현재 로그인된 사용자의 ID를 사용해야 합니다.
-    );
-    if (result.isNotEmpty) {
-      await db.update(
-        'customer',
-        {'password': newPassword},
-        where: 'id = ?',
-        whereArgs: [1], // 현재 로그인된 사용자의 ID를 사용해야 합니다.
-      );
-      return true;
-    }
-    return false;
-  }
-
-  Future<List<Product>> queryProductByName(String searchQuery) async {
-    final Database db = await initializeDB();
-    final List<Map<String, Object?>> queryResults = await db.rawQuery(
-      'select * from product where name like ?',
-      ['%$searchQuery%'], // 검색어가 포함된 제품을 찾기 위한 조건
-    );
-    return queryResults.map((e) => Product.fromMap(e)).toList();
-  }
-
-
-
-// ----------------------------------------
   Future<int> deletProduct(Product product) async {
     int result = 0;
     final Database db = await initializeDB();
@@ -404,9 +308,12 @@ Future<Map<String, dynamic>> getCurrentUser() async {
       orders.quantity,
       orders.total_price,
       orders.state
+    ]);
+    return result;
+  }
 
 // ---- 정영+승현 -----
- Future<List<Map<String, dynamic>>> getProductsSummary() async {
+  Future<List<Map<String, dynamic>>> getProductsSummary() async {
     final db = await initializeDB();
     final List<Map<String, dynamic>> result = await db.rawQuery('''
       SELECT
@@ -583,10 +490,10 @@ Future<Map<String, dynamic>> getCurrentUser() async {
       customer.phone,
       customer.password,
       customer.image
-
     ]);
     return result;
   }
+
 // -------------------------------
   Future<List<Map<String, dynamic>>> quaryOrders() async {
     final Database db = await initializeDB();
@@ -606,18 +513,24 @@ Future<Map<String, dynamic>> getCurrentUser() async {
     return result;
   }
 
+  // Future<List<Product>> quaryProduct() async {
+  //   final Database db = await initializeDB();
+  //   final List<Map<String, Object?>> queryResult =
+  //       await db.rawQuery('select * from product');
+  //   return queryResult.map((e) => Product.fromMap(e)).toList();
+  // }
+
   Future<List<Product>> quaryProduct() async {
     final Database db = await initializeDB();
-    final List<Map<String, Object?>> queryResult =
-        await db.rawQuery('select * from product');
-    return queryResult.map((e) => Product.fromMap(e)).toList();
+    var result = await db.rawQuery('SELECT * FROM product');
+    print(result); // 데이터베이스 쿼리 결과 확인
+    return result.map((e) => Product.fromMap(e)).toList();
   }
 
   Future<List<Customer>> queryCustomersId(Customer customer) async {
     final Database db = await initializeDB();
     final List<Map<String, dynamic>> queryResults =
         await db.rawQuery('SELECT * FROM customer WHERE id = ?', [customer.id]);
-
     return queryResults.map((e) => Customer.fromMap(e)).toList();
   }
-}
+}// End

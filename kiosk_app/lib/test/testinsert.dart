@@ -156,7 +156,7 @@ class _TestinsertState extends State<Testinsert> {
         price: int.parse(priceController.text.trim()),
         brand: brandController.text.trim(),
         image: getImage);
-    int result = await handler.insertproduct(productInsert);
+    int result = await handler.insertProduct(productInsert);
     if (result != 0) {
       _showDialog();
     }

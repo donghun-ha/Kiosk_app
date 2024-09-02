@@ -10,6 +10,7 @@ class CoOutDetail extends StatefulWidget {
   const CoOutDetail({super.key, required this.order});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CoOutDetailState createState() => _CoOutDetailState();
 }
 
@@ -109,7 +110,8 @@ class _CoOutDetailState extends State<CoOutDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('픽업매장: ${widget.order.store_id ?? 'N/A'}'),
+                  Text('픽업매장: ${widget.order.store_id}'),
+                  //?? 'N/A'
                   Text('배송상태: ${_getDeliveryStatus(widget.order.pickup_date)}'),
                 ],
               ),

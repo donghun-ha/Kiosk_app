@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kiosk_app/model/orders.dart';
-import 'package:kiosk_app/model/product.dart';
 import 'package:kiosk_app/vm/database_handler.dart';
-import 'package:sqflite/sqflite.dart';
 
 class CustomerProduct extends StatefulWidget {
   const CustomerProduct({super.key});
@@ -373,9 +371,11 @@ class _CustomerProductState extends State<CustomerProduct> {
                             product_id: selectSize, 
                             store_id: selectLocalname,
                             quantity: count, 
-                            totalprice: price * count
+                            total_price: price * count,
+                            state: '결제전'
                             );
                             await handler.insertOrders(orders);
+                            Get.back();
                             setState(() {});
                         },
                         style: ElevatedButton.styleFrom(

@@ -58,6 +58,7 @@ class DatabaseHandler{
               quantity integer,
               total_price integer,
               pickup_date date,
+              state text,
               FOREIGN KEY(customer_id) REFERENCES customer(id),
               FOREIGN KEY(product_id) REFERENCES product(id),
               FOREIGN KEY(store_id) REFERENCES store(id)
@@ -132,23 +133,22 @@ class DatabaseHandler{
           return queryResult.map((e) => Product.fromMap(e)).toList();
   }
 
-  Future<List<Orders>> quaryOrdercart() async{
+  // Future<List<Store>> quaryStore() async{
+  //   final Database db = await initiallizeDB();
+  //   final List<Map<String, Object?>> queryResult = 
+  //         await db.rawQuery(
+  //           """select max(p.id) id, p.name, p.image image, o.totalprice, p.price 
+  //           from orders o, product.p 
+  //           where o.product_id = p.id 
+  //           group by id
+  //           """
+  //           );
+  //         return queryResult.map((e) => Store.fromMap(e)).toList();
+  // }
+    Future<List<Store>> quaryStore() async{
     final Database db = await initiallizeDB();
     final List<Map<String, Object?>> queryResult = 
-          await db.rawQuery('select * from product');
-          return queryResult.map((e) => Orders.fromMap(e)).toList();
-  }
-
-  Future<List<Store>> quaryStore() async{
-    final Database db = await initiallizeDB();
-    final List<Map<String, Object?>> queryResult = 
-          await db.rawQuery(
-            """select max(p.id) id, p.name, p.image, o.totalprice, p.price 
-            from orders o, product.p 
-            where o.product_id = p.id 
-            group by id
-            """
-            );
+          await db.rawQuery('select * from store');
           return queryResult.map((e) => Store.fromMap(e)).toList();
   }
   Future<int> insertOrders(Orders orders)async{
@@ -156,10 +156,45 @@ class DatabaseHandler{
     final Database db = await initiallizeDB();
     result = await db.rawInsert(
       """
-        insert into orders (customer_id, product_id, store_id, date, quantity, total_price, pickup_date)
-        values(?,?,?,date('now'),?,?,date('now', '+7 days'))
-      """, [orders.customer_id, orders.product_id, orders.store_id, orders.quantity, orders.totalprice]
+        insert into orders (customer_id, product_id, store_id, date, quantity, total_price, pickup_date, state)
+        values(?,?,?,date('now'),?,?,date('now', '+7 days'),?)
+      """, [orders.customer_id, orders.product_id, orders.store_id, orders.quantity, orders.total_price, orders.state]
     );
+    return result;
+  }
+      Future<List<Map<String, dynamic>>> quaryOrders() async{
+    final Database db = await initiallizeDB();
+    final List<Map<String, dynamic>> queryResult = 
+          await db.rawQuery(
+            """
+              select orders.id id, product.image image, product.name name, product.brand, orders.total_price total_price, orders.quantity quantity, store.name sname, orders.state state, product.color color, product.size size, orders.date date
+              from orders inner join product on orders.product_id = product.id inner join store on orders.store_id = store.id
+            """
+            );
+          return queryResult;
+  }
+
+  Future<int> updateOrders(int id)async{
+    int result = 0;
+    final Database db = await initiallizeDB();
+    result = await db.rawUpdate(
+      """
+        update orders set state = '결제완료' where id = ?
+      """,
+      [id]
+    );
+    return result;
+  }
+
+  Future<int> deleteOrders(int number)async{
+    int result = 0;
+    final Database db = await initiallizeDB();
+    result = await db.rawDelete(
+      """
+        delete from orders where id = ?
+      """, [number]
+    );
+    print("Update return value : $result");
     return result;
   }
 }

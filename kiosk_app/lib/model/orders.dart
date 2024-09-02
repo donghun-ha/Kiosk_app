@@ -1,12 +1,15 @@
+
+
 class Orders{
-  String? id;
+  int? id;
   String customer_id;
   String product_id;
   String store_id;
   String? date;
   int quantity;
-  int totalprice;
-  String? pickupdate;
+  int total_price;
+  String? pickup_date;
+  String state;
 
   Orders({
     this.id,
@@ -15,8 +18,9 @@ class Orders{
     required this.store_id,
     this.date,
     required this.quantity,
-    required this.totalprice,
-    this.pickupdate
+    required this.total_price,
+    this.pickup_date,
+    required this.state
   });
 
     Orders.fromMap(Map<String, dynamic> res)
@@ -26,6 +30,7 @@ class Orders{
   store_id = res['store_id'],
   date = res['date'],
   quantity = res['quantity'],
-  totalprice = res['totalprice'],
-  pickupdate = res['pickupdate'];
+  total_price = res['total_price'],
+  pickup_date = res['pickup_date'],
+  state = res['state'];
 }

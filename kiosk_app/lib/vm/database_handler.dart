@@ -3,8 +3,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:kiosk_app/model/product.dart';
 import 'package:kiosk_app/model/store.dart';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:kiosk_app/model/customer.dart';
+import 'package:flutter/foundation.dart';
 
 class DatabaseHandler {
   Future<Database> initializeDB() async {
@@ -82,9 +82,23 @@ class DatabaseHandler {
     return await db.query('orders', orderBy: 'date DESC');
   }
 
-  Future<int> insertProduct(Product product) async {
+  Future<int> insertproduct(Product product) async {
+    int result = 0;
     final Database db = await initializeDB();
-    return await db.insert('product', product.toMap());
+    result = await db.rawInsert("""
+        insert into product (id, name, size, color, stock, price, brand,image)
+        values(?,?,?,?,?,?,?,?)
+      """, [
+      product.id,
+      product.name,
+      product.size,
+      product.color,
+      product.stock,
+      product.price,
+      product.brand,
+      product.image
+    ]);
+    return result;
   }
 
   Future<Map<String, dynamic>> getCurrentUser() async {
@@ -140,6 +154,27 @@ class DatabaseHandler {
     return false;
   }
 
+  Future<List<Product>> queryProductByName(String searchQuery) async {
+    final Database db = await initializeDB();
+    final List<Map<String, Object?>> queryResults = await db.rawQuery(
+      'select * from product where name like ?',
+      ['%$searchQuery%'], // 검색어가 포함된 제품을 찾기 위한 조건
+    );
+    return queryResults.map((e) => Product.fromMap(e)).toList();
+  }
+
+  Future<int> deletProduct(Product product) async {
+    int result = 0;
+    final Database db = await initializeDB();
+    result = await db.rawDelete("""
+        delete from product where id = ?  
+      """, [product.id]);
+    if (kDebugMode) {
+      print("Update return Value : $result");
+    }
+    return result;
+  }
+
   Future<List<Map<String, dynamic>>> getProductsSummary() async {
     final db = await initializeDB();
     final List<Map<String, dynamic>> result = await db.rawQuery('''
@@ -171,6 +206,16 @@ class DatabaseHandler {
       print('Error in getProductDetails: $e');
       throw Exception('Failed to load product details: $e');
     }
+  }
+
+  Future<List<Product>> queryproduct() async {
+    final Database db = await initializeDB();
+    final List<Map<String, Object?>> //
+        queryResults = await db.rawQuery('select * from product');
+    if (kDebugMode) {
+      print('Query Results: $queryResults');
+    }
+    return queryResults.map((e) => Product.fromMap(e)).toList();
   }
 
   Future<List<Map<String, dynamic>>> getProductItems(String productName) async {

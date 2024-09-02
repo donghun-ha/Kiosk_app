@@ -9,7 +9,7 @@ class Store {
       : id = res['id'],
         name = res['name'],
         address = res['address'];
-
+// 승현+정영 합친 버전
   Map<String, dynamic> toMap() {
     return {
       'id': id,

@@ -12,7 +12,7 @@ class _CoBrandState extends State<CoBrand> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('1'),
+        title: Text('1'),
       ),
     );
   }

@@ -29,7 +29,7 @@ class Product {
         price = res['price'],
         brand = res['brand'],
         image = res['image'];
-
+// 승현 + 정영 합친 버전
   Map<String, dynamic> toMap() {
     return {
       'id': id,

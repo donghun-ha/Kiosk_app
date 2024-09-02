@@ -283,7 +283,7 @@ class _SignState extends State<Sign> {
       phone: phoneController.text.trim(),
       // image: getImage,
     );
-    int result = await handler.insertcustomer(customerInsert);
+    int result = await handler.insertCustomer(customerInsert);
 
     if (result > 0) {
       _showDialog();

@@ -24,7 +24,7 @@ class _KioskDetailState extends State<KioskDetail> {
         ),
       ),
       body: FutureBuilder(
-        future: handler.queryproduct(), // 나중에 오더 함수로 바꿔줘야함.
+        future: handler.queryProduct(), // 나중에 오더 함수로 바꿔줘야함.
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return GridView.builder(

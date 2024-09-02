@@ -62,7 +62,7 @@ class LocalInventController extends GetxController {
 }
 
 class LocalInventPage extends GetView<LocalInventController> {
-  LocalInventPage({super.key});
+  const LocalInventPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -71,15 +71,12 @@ class LocalInventPage extends GetView<LocalInventController> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFF0FFF5),
-        title: Text('상품 재고'),
+        title: const Text('상품 재고'),
         actions: [
           IconButton(
-            icon: Icon(Icons.account_circle),
+            icon: const Icon(Icons.account_circle),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LocalProfilePage()),
-              );
+              Get.to(() => const LocalProfilePage());
             },
           ),
         ],
@@ -95,20 +92,20 @@ class LocalInventPage extends GetView<LocalInventController> {
                     controller: controller.searchController,
                     decoration: InputDecoration(
                       labelText: '${controller.searchType.value} 검색',
-                      suffixIcon: Icon(Icons.search),
+                      suffixIcon: const Icon(Icons.search),
                     ),
                     onChanged: controller.filterProducts,
                   ),
                 ),
                 PopupMenuButton<String>(
-                  icon: Icon(Icons.arrow_drop_down),
+                  icon: const Icon(Icons.arrow_drop_down),
                   onSelected: (String value) {
                     controller.searchType.value = value;
                     controller.filterProducts(controller.searchController.text);
                   },
                   itemBuilder: (BuildContext context) => [
-                    PopupMenuItem(value: '제품명', child: Text('제품명')),
-                    PopupMenuItem(value: '브랜드', child: Text('브랜드')),
+                    const PopupMenuItem(value: '제품명', child: Text('제품명')),
+                    const PopupMenuItem(value: '브랜드', child: Text('브랜드')),
                   ],
                 ),
               ],
@@ -117,31 +114,26 @@ class LocalInventPage extends GetView<LocalInventController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               } else if (controller.filteredProducts.isEmpty) {
-                return Center(child: Text('검색 결과가 없습니다'));
+                return const Center(child: Text('검색 결과가 없습니다'));
               } else {
                 return GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 0.85,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 5,
                   ),
-                  padding: EdgeInsets.all(35),
+                  padding: const EdgeInsets.all(35),
                   itemCount: controller.filteredProducts.length,
                   itemBuilder: (context, index) {
                     final product = controller.filteredProducts[index];
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LocalInventDetailPage(
+                        Get.to(() => LocalInventDetailPage(
                               productName: product['name'].toString(),
-                            ),
-                          ),
-                        );
+                            ));
                       },
                       child: Card(
                         child: Column(
@@ -161,7 +153,7 @@ class LocalInventPage extends GetView<LocalInventController> {
                                       width: double.infinity,
                                     );
                                   } else {
-                                    return Center(
+                                    return const Center(
                                         child: Icon(Icons.image_not_supported,
                                             size: 50));
                                   }
@@ -175,8 +167,8 @@ class LocalInventPage extends GetView<LocalInventController> {
                                 children: [
                                   Text(
                                     product['name'] ?? 'No name',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),

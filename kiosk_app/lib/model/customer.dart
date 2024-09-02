@@ -5,14 +5,14 @@ class Customer {
   String name;
   String phone;
   String password;
-  Uint8List image;
+  Uint8List? image;
 
   Customer({
     required this.id,
     required this.name,
     required this.phone,
     required this.password,
-    required this.image,
+    this.image,
   });
 
   Customer.fromMap(Map<String, dynamic> res)

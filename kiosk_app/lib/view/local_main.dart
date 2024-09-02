@@ -31,8 +31,8 @@ class LocalMainController extends GetxController {
   }
 }
 
-class LocalMainPage extends GetView<LocalMainController> {
-  const LocalMainPage({super.key});
+class LocalMain extends GetView<LocalMainController> {
+  const LocalMain({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,8 @@ class LocalMainPage extends GetView<LocalMainController> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LocalProfilePage()),
+                MaterialPageRoute(
+                    builder: (context) => const LocalProfilePage()),
               );
             },
           ),
@@ -58,7 +59,7 @@ class LocalMainPage extends GetView<LocalMainController> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SizedBox(height: 30),
+            const SizedBox(height: 70),
             Container(
               width: 350,
               height: 400,
@@ -74,7 +75,7 @@ class LocalMainPage extends GetView<LocalMainController> {
                   children: [
                     Obx(() => Text(
                           controller.storeName.value,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 34, fontWeight: FontWeight.bold),
                         )),
                     SizedBox(height: 76),
@@ -86,7 +87,7 @@ class LocalMainPage extends GetView<LocalMainController> {
                       child: Column(
                         children: [
                           Container(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 12),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,7 +95,7 @@ class LocalMainPage extends GetView<LocalMainController> {
                                 Text('픽업 신청', style: TextStyle(fontSize: 18)),
                                 Obx(() => Text(
                                       '${controller.pickupRequestCount.value} 건',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
                                     )),
@@ -103,7 +104,7 @@ class LocalMainPage extends GetView<LocalMainController> {
                           ),
                           Divider(height: 1, color: Colors.grey[400]),
                           Container(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 12),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -111,7 +112,7 @@ class LocalMainPage extends GetView<LocalMainController> {
                                 Text('당일 픽업', style: TextStyle(fontSize: 18)),
                                 Obx(() => Text(
                                       '${controller.todayPickupCount.value} 건',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
                                     )),
@@ -133,7 +134,8 @@ class LocalMainPage extends GetView<LocalMainController> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LocalOrderPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const LocalOrderPage()),
                     );
                   },
                   text: '주문 내역',
@@ -146,7 +148,7 @@ class LocalMainPage extends GetView<LocalMainController> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => LocalInventPage()),
+                          builder: (context) => const LocalInventPage()),
                     );
                   },
                   text: '상품 재고',
@@ -173,20 +175,20 @@ class LocalMainPage extends GetView<LocalMainController> {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0XFF3A895F),
+          backgroundColor: const Color(0XFF3A895F),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 50, color: Colors.white),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             Text(
               text,
-              style: TextStyle(fontSize: 18, color: Colors.white),
+              style: const TextStyle(fontSize: 18, color: Colors.white),
               textAlign: TextAlign.center,
             ),
           ],

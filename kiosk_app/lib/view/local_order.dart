@@ -52,7 +52,7 @@ class LocalOrderController extends GetxController {
 }
 
 class LocalOrderPage extends GetView<LocalOrderController> {
-  const LocalOrderPage({Key? key}) : super(key: key);
+  const LocalOrderPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +132,7 @@ class LocalOrderPage extends GetView<LocalOrderController> {
 class OrderCard extends StatelessWidget {
   final Map<String, dynamic> order;
 
-  const OrderCard({Key? key, required this.order}) : super(key: key);
+  const OrderCard({super.key, required this.order});
 
   @override
   Widget build(BuildContext context) {

@@ -27,8 +27,6 @@ class LocalInventDetailController extends GetxController {
         productImage.value = await _databaseHandler
             .getProductImage(items.first['id'].toString());
       }
-    } catch (e) {
-      print('Error loading product details: $e');
     } finally {
       isLoading.value = false;
     }
@@ -37,11 +35,11 @@ class LocalInventDetailController extends GetxController {
   String formatPrice(dynamic price) {
     if (price == null) return 'N/A';
     if (price is num) {
-      return '${price.toStringAsFixed(2)}원';
+      return '${price.toStringAsFixed(0)}원';
     }
     if (price is String) {
       try {
-        return '${double.parse(price).toStringAsFixed(2)}원';
+        return '${int.parse(price).toStringAsFixed(0)}원';
       } catch (e) {
         return '${price}원';
       }
@@ -51,8 +49,9 @@ class LocalInventDetailController extends GetxController {
 }
 
 class LocalInventDetailPage extends GetView<LocalInventDetailController> {
-  LocalInventDetailPage({Key? key, required String productName})
-      : super(key: key) {
+  final String productName;
+
+  LocalInventDetailPage({super.key, required this.productName}) {
     Get.put(LocalInventDetailController(productName: productName));
   }
 
@@ -61,28 +60,30 @@ class LocalInventDetailPage extends GetView<LocalInventDetailController> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFF0FFF5),
-        title: Text('상품 재고 상세'),
+        title: const Text('상품 재고 상세'),
         actions: [
           IconButton(
-            icon: Icon(Icons.account_circle),
+            icon: const Icon(Icons.account_circle),
             onPressed: () => Get.toNamed('/local_profile'),
           ),
         ],
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (controller.items.isEmpty) {
-          return Center(child: Text('No data available for this product'));
+          return const Center(
+              child: Text('No data available for this product'));
         }
 
         return Column(
           children: [
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Text(
-                controller.productName,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                productName,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
             Obx(() {
@@ -91,20 +92,21 @@ class LocalInventDetailPage extends GetView<LocalInventDetailController> {
                   controller.productImage.value!,
                   width: 200,
                   height: 200,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                 );
               } else {
-                return Icon(Icons.image_not_supported, size: 200);
+                return const Icon(Icons.image_not_supported, size: 200);
               }
             }),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
                 itemCount: controller.items.length,
                 itemBuilder: (context, index) {
                   final item = controller.items[index];
                   return Card(
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: ListTile(
                       title: Text('${item['color']} - ${item['size']}'),
                       subtitle: Text('품목 ID: ${item['id']}'),

@@ -4,6 +4,7 @@ import 'package:kiosk_app/model/product.dart';
 import 'package:kiosk_app/model/store.dart';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:kiosk_app/model/customer.dart';
 
 class DatabaseHandler {
   Future<Database> initializeDB() async {
@@ -21,7 +22,6 @@ class DatabaseHandler {
             image BLOB
           );
         """);
-
         await db.execute("""
           CREATE TABLE product (
             id TEXT PRIMARY KEY,
@@ -33,7 +33,6 @@ class DatabaseHandler {
             brand TEXT
           );
         """);
-
         await db.execute("""
           CREATE TABLE store (
             id TEXT PRIMARY KEY,
@@ -41,7 +40,6 @@ class DatabaseHandler {
             address TEXT
           );
         """);
-
         await db.execute("""
           CREATE TABLE orders (
             id TEXT PRIMARY KEY,
@@ -57,7 +55,6 @@ class DatabaseHandler {
             FOREIGN KEY(store_id) REFERENCES store(id)
           );
         """);
-
         await db.execute("""
           CREATE TABLE inventory (
             id TEXT PRIMARY KEY,
@@ -107,18 +104,14 @@ class DatabaseHandler {
     Uint8List? image,
   }) async {
     final db = await initializeDB();
-
     final Map<String, dynamic> updateData = {
       'name': name,
       'phone': phone,
     };
-
     if (image != null) {
-      // Uint8List를 Base64 문자열로 변환
       String base64Image = base64Encode(image);
       updateData['image'] = base64Image;
     }
-
     await db.update(
       'customer',
       updateData,
@@ -150,32 +143,29 @@ class DatabaseHandler {
   Future<List<Map<String, dynamic>>> getProductsSummary() async {
     final db = await initializeDB();
     final List<Map<String, dynamic>> result = await db.rawQuery('''
-    SELECT 
-      id, 
-      name, 
-      brand, 
-      SUM(p.stock) as total_stock, 
-      price as avg_price
-    FROM product p 
-    GROUP BY p.name, p.brand
-  ''');
+      SELECT
+        id,
+        name,
+        brand,
+        SUM(p.stock) as total_stock,
+        price as avg_price
+      FROM product p
+      GROUP BY p.name, p.brand
+    ''');
     return result;
   }
 
-  Future<Map<String, dynamic>> getProductDetails(String productId) async {
+  Future<Map<String, dynamic>> getProductDetails(String productName) async {
     try {
       final db = await initializeDB();
-
       final List<Map<String, dynamic>> results = await db.query(
         'product',
         where: 'id = ?',
-        whereArgs: [productId],
+        whereArgs: [productName],
       );
-
       if (results.isEmpty) {
         throw Exception('Product not found');
       }
-
       return results.first;
     } catch (e) {
       print('Error in getProductDetails: $e');
@@ -190,6 +180,7 @@ class DatabaseHandler {
       where: 'name = ?',
       whereArgs: [productName],
     );
+    print('Product items for name $productName: $result');
     return result;
   }
 
@@ -211,7 +202,6 @@ class DatabaseHandler {
       where: 'id = ?',
       whereArgs: [productId],
     );
-
     if (result.isNotEmpty && result.first['image'] != null) {
       return result.first['image'] as Uint8List;
     }
@@ -221,9 +211,9 @@ class DatabaseHandler {
   Future<int> getPickupRequestCount() async {
     final db = await initializeDB();
     final result = await db.rawQuery('''
-    SELECT COUNT(*) as count FROM orders 
-    WHERE date(pickup_date) >= date('now', 'localtime')
-  ''');
+      SELECT COUNT(*) as count FROM orders
+      WHERE date(pickup_date) >= date('now', 'localtime')
+    ''');
     print('Pickup request count: ${result.first['count']}'); // 디버깅용 출력
     return Sqflite.firstIntValue(result) ?? 0;
   }
@@ -231,14 +221,13 @@ class DatabaseHandler {
   Future<int> getTodayPickupCount() async {
     final db = await initializeDB();
     final result = await db.rawQuery('''
-    SELECT COUNT(*) as count FROM orders 
-    WHERE date(pickup_date) = date('now', 'localtime')
-  ''');
+      SELECT COUNT(*) as count FROM orders
+      WHERE date(pickup_date) = date('now', 'localtime')
+    ''');
     print('Today pickup count: ${result.first['count']}'); // 디버깅용 출력
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
-  // 제품 목록을 가져오는 메서드도 추가
   Future<List<Map<String, dynamic>>> getProducts() async {
     final db = await initializeDB();
     return await db.query('product');
@@ -259,19 +248,18 @@ class DatabaseHandler {
     final now = DateTime.now();
     print('Current date: ${now.toIso8601String()}');
     final todayOrders = await db.rawQuery('''
-    SELECT * FROM orders 
-    WHERE date(pickup_date) = date('now', 'localtime')
-  ''');
+      SELECT * FROM orders
+      WHERE date(pickup_date) = date('now', 'localtime')
+    ''');
     print('Today\'s pickup orders:');
     for (var order in todayOrders) {
       print(
           'ID: ${order['id']}, Date: ${order['date']}, Pickup Date: ${order['pickup_date']}');
     }
-
     final futureOrders = await db.rawQuery('''
-    SELECT * FROM orders 
-    WHERE date(pickup_date) > date('now', 'localtime')
-  ''');
+      SELECT * FROM orders
+      WHERE date(pickup_date) > date('now', 'localtime')
+    ''');
     print('Future pickup orders:');
     for (var order in futureOrders) {
       print(
@@ -291,5 +279,43 @@ class DatabaseHandler {
     } else {
       throw Exception('주문을 찾을 수 없습니다.');
     }
+  }
+
+  Future<Customer?> fetchCustomerByIdAndPassword(
+      String id, String password) async {
+    final Database db = await initializeDB();
+    final List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT * FROM customer WHERE id = ? AND password = ?',
+      [id, password],
+    );
+
+    if (result.isNotEmpty) {
+      return Customer.fromMap(result.first);
+    }
+    return null; // 고객 정보가 없으면 null 반환
+  }
+
+  Future<int> insertcustomer(Customer customer) async {
+    int result = 0;
+    final Database db = await initializeDB();
+    result = await db.rawInsert("""
+        insert into customer (id, name, phone, password, image)
+        values(?,?,?,?,?)
+      """, [
+      customer.id,
+      customer.name,
+      customer.phone,
+      customer.password,
+      customer.image
+    ]);
+    return result;
+  }
+
+  Future<List<Customer>> queryCustomersById(String id) async {
+    final Database db = await initializeDB();
+    final List<Map<String, dynamic>> queryResults =
+        await db.rawQuery('SELECT * FROM customer WHERE id = ?', [id]);
+
+    return queryResults.map((e) => Customer.fromMap(e)).toList();
   }
 }

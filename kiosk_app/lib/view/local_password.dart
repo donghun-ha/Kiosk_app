@@ -33,16 +33,16 @@ class LocalPasswordPage extends GetView<LocalPasswordController> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFF0FFF5),
-        title: Text('비밀번호 변경'),
+        title: const Text('비밀번호 변경'),
       ),
       body: Form(
         key: controller.formKey,
         child: ListView(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           children: [
             TextFormField(
               controller: controller.currentPasswordController,
-              decoration: InputDecoration(labelText: '현재 비밀번호'),
+              decoration: const InputDecoration(labelText: '현재 비밀번호'),
               obscureText: true,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -53,7 +53,7 @@ class LocalPasswordPage extends GetView<LocalPasswordController> {
             ),
             TextFormField(
               controller: controller.newPasswordController,
-              decoration: InputDecoration(labelText: '새 비밀번호'),
+              decoration: const InputDecoration(labelText: '새 비밀번호'),
               obscureText: true,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -64,7 +64,7 @@ class LocalPasswordPage extends GetView<LocalPasswordController> {
             ),
             TextFormField(
               controller: controller.confirmPasswordController,
-              decoration: InputDecoration(labelText: '새 비밀번호 확인'),
+              decoration: const InputDecoration(labelText: '새 비밀번호 확인'),
               obscureText: true,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -76,10 +76,10 @@ class LocalPasswordPage extends GetView<LocalPasswordController> {
                 return null;
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: controller.changePassword,
-              child: Text('비밀번호 변경'),
+              child: const Text('비밀번호 변경'),
             ),
           ],
         ),

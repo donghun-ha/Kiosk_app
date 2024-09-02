@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kiosk_app/view/local_modify.dart';
 import 'package:kiosk_app/vm/database_handler.dart';
 import 'dart:typed_data';
 
@@ -28,7 +29,7 @@ class LocalProfileController extends GetxController {
 }
 
 class LocalProfilePage extends StatelessWidget {
-  const LocalProfilePage({Key? key}) : super(key: key);
+  const LocalProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,46 +38,48 @@ class LocalProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFF0FFF5),
-        title: Text('프로필'),
+        title: const Text('프로필'),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (controller.user.value.isEmpty) {
-          return Center(child: Text('사용자 정보를 찾을 수 없습니다.'));
+          return const Center(child: Text('사용자 정보를 찾을 수 없습니다.'));
         }
 
         final user = controller.user.value;
         return Column(
           children: [
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             CircleAvatar(
               radius: 50,
               backgroundImage: user['image'] != null
                   ? MemoryImage(user['image'] as Uint8List)
-                  : AssetImage('images/default_profile.png') as ImageProvider,
+                  : const AssetImage('images/default_profile.png')
+                      as ImageProvider,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(user['name'],
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/local_modify');
+                Get.to(() => LocalModifyPage());
               },
               child: Text('프로필 수정'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ListTile(
-              title: Text('ID'),
+              title: const Text('ID'),
               subtitle: Text(user['id']),
             ),
             ListTile(
-              title: Text('휴대폰 번호'),
+              title: const Text('휴대폰 번호'),
               subtitle: Text(user['phone']),
             ),
             ListTile(
-              title: Text('매장 번호'),
+              title: const Text('매장 번호'),
               subtitle: Text(user['store_id'] ?? '없음'),
             ),
           ],

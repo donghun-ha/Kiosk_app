@@ -53,8 +53,7 @@ class LocalOrderDetailController extends GetxController {
 class LocalOrderDetailPage extends StatelessWidget {
   final String orderId;
 
-  const LocalOrderDetailPage({Key? key, required this.orderId})
-      : super(key: key);
+  const LocalOrderDetailPage({super.key, required this.orderId});
 
   @override
   Widget build(BuildContext context) {

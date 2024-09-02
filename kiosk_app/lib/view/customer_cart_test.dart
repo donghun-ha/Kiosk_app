@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:kiosk_app/vm/database_handler.dart';
 
-class CustomerCart extends StatefulWidget {
-  const CustomerCart({super.key});
+class CustomerCartTest extends StatefulWidget {
+  const CustomerCartTest({super.key});
 
   @override
-  State<CustomerCart> createState() => _CustomerCartState();
+  State<CustomerCartTest> createState() => _CustomerCartTestState();
 }
 
-class _CustomerCartState extends State<CustomerCart> {
+class _CustomerCartTestState extends State<CustomerCartTest> {
   late int orderId;
   late DatabaseHandler handler;
 

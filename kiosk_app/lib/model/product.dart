@@ -3,7 +3,7 @@ import 'dart:typed_data';
 class Product {
   String id;
   String name;
-  int size;
+  String size; // int에서 String으로 변경
   String color;
   int stock;
   int price;
@@ -23,10 +23,27 @@ class Product {
   Product.fromMap(Map<String, dynamic> res)
       : id = res['id'],
         name = res['name'],
-        size = res['size'],
+        size = res['size'].toString(),
         color = res['color'],
         stock = res['stock'],
         price = res['price'],
         brand = res['brand'],
-        image = res['image'];
+        image = res['image'] != null
+            ? (res['image'] is Uint8List
+                ? res['image']
+                : Uint8List.fromList(res['image'].cast<int>()))
+            : null;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'size': size,
+      'color': color,
+      'stock': stock,
+      'price': price,
+      'brand': brand,
+      'image': image, // image 필드 추가
+    };
+  }
 }

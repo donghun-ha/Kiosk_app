@@ -102,7 +102,7 @@ class _CustomerPaymentState extends State<CustomerPayment> {
               width: 360,
               height: 550,
               child: FutureBuilder(
-                future: handler.quaryOrders(),
+                future: handler.queryOrders(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
@@ -118,15 +118,15 @@ class _CustomerPaymentState extends State<CustomerPayment> {
                                     Container(
                                       width: 100,
                                       height: 100,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        color: const Color(0xffE4E4E4),
+                                      ),
                                       child: Center(
                                           child: Image.memory(
                                         snapshot.data![index]['image'],
                                         width: 100,
                                       )),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: Color(0xffE4E4E4),
-                                      ),
                                     ),
                                   ],
                                 ),
@@ -140,14 +140,14 @@ class _CustomerPaymentState extends State<CustomerPayment> {
                                               10, 0, 5, 0),
                                           child: Text(
                                             snapshot.data![index]['brand'],
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 15),
                                           ),
                                         ),
                                         Text(
                                           snapshot.data![index]['name'],
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ],
@@ -163,14 +163,14 @@ class _CustomerPaymentState extends State<CustomerPayment> {
                             ),
                           );
                         } else {
-                          return Center(
+                          return const Center(
                             child: Text('data 없음'),
                           );
                         }
                       },
                     );
                   } else {
-                    return Center(
+                    return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
@@ -195,14 +195,14 @@ class _CustomerPaymentState extends State<CustomerPayment> {
   }
 
   firstchangeColor() {
-    firstButtonColor = Color(0xff6644AB);
-    secondButtonColor = Color.fromARGB(255, 186, 167, 225);
+    firstButtonColor = const Color(0xff6644AB);
+    secondButtonColor = const Color.fromARGB(255, 186, 167, 225);
     setState(() {});
   }
 
   secondchangeColor() {
-    firstButtonColor = Color.fromARGB(255, 186, 167, 225);
-    secondButtonColor = Color(0xff6644AB);
+    firstButtonColor = const Color.fromARGB(255, 186, 167, 225);
+    secondButtonColor = const Color(0xff6644AB);
     setState(() {});
   }
 }

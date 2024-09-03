@@ -135,7 +135,7 @@ class _CoMainState extends State<CoMain> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               GestureDetector(
-                onTap: () => Get.to(const CoOrder()),
+                onTap: () => Get.to(() => const CoOrder()),
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Container(
@@ -158,7 +158,7 @@ class _CoMainState extends State<CoMain> {
                 ),
               ),
               GestureDetector(
-                onTap: () => Get.to(const CoOut()),
+                onTap: () => Get.to(() => const CoOut()),
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Container(

@@ -172,3 +172,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,flutter,dart,windows,macos
+kiosk_app/ios/Runner.xcodeproj/project.pbxproj

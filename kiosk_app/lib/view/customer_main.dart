@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kiosk_app/model/product.dart';
 import 'package:kiosk_app/model/store.dart';
 import 'package:kiosk_app/test/testid.dart';
 import 'package:kiosk_app/test/testinsert.dart';
@@ -19,11 +20,15 @@ class _CustomerMainState extends State<CustomerMain> {
   late List<String> storeAddress;
   late List<String> list;
   late DatabaseHandler handler;
+  late Future<List<Product>> productsFuture;
 
   @override
   void initState() {
     super.initState();
-    handler = DatabaseHandler();
+    handler = DatabaseHandler(); // 먼저 DatabaseHandler를 초기화
+    productsFuture = Future.value([]); // Future의 초기값 설정
+    _initializeDatabase(); // 그 다음에 데이터베이스 초기화
+
     list = ['1', '2', '3', '3', '3'];
     storeId = [
       'S001',
@@ -38,6 +43,13 @@ class _CustomerMainState extends State<CustomerMain> {
     ];
   }
 
+  void _initializeDatabase() async {
+    await handler.initializeDB(); // 데이터베이스 초기화
+    setState(() {
+      productsFuture = handler.queryProduct(); // Future 설정 후 상태 업데이트
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,63 +60,53 @@ class _CustomerMainState extends State<CustomerMain> {
           'Menu',
           style: TextStyle(fontWeight: FontWeight.w500, fontSize: 40),
         ),
-        // ----------test---------
         actions: [
           TextButton(
-              onPressed: () async {
-                for (int i = 0; i < storeId.length; i++) {
-                  Store store = Store(
-                      id: storeId[i],
-                      name: storeName[i],
-                      address: storeAddress[i]);
-                  await handler.insertStore(store);
-                }
-              },
-              child: const Text('Local')),
+            onPressed: () async {
+              for (int i = 0; i < storeId.length; i++) {
+                Store store = Store(
+                    id: storeId[i],
+                    name: storeName[i],
+                    address: storeAddress[i]);
+                await handler.insertStore(store);
+              }
+              reloadData();
+            },
+            child: const Text('Local'),
+          ),
           TextButton(
-              onPressed: () {
-                Get.to(() => const Testid())!.then((value) => reloadData());
-              },
-              child: Text('ID')),
+            onPressed: () {
+              Get.to(() => const Testid())!.then((value) => reloadData());
+            },
+            child: const Text('ID'),
+          ),
           TextButton(
-              onPressed: () {
-                Get.to(() => const Testinsert())!.then((value) => reloadData());
-              },
-              child: const Text('Test'))
+            onPressed: () {
+              Get.to(() => const Testinsert())!.then((value) => reloadData());
+            },
+            child: const Text('Test'),
+          ),
         ],
-        // ----------test---------
       ),
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
           children: [
-            // ----------Search-----------
+            // 검색 관련 UI
             Container(
               width: 310,
               height: 55,
-              color: Color.fromARGB(255, 219, 219, 219),
-              child: Row(
+              color: const Color.fromARGB(255, 219, 219, 219),
+              child: const Row(
                 children: [Icon(Icons.search), Text('Search')],
               ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextButton(
-                    onPressed: () {
-                      //
-                    },
-                    child: const Text('Nike')),
-                TextButton(
-                    onPressed: () {
-                      //
-                    },
-                    child: const Text('NewBalance')),
-                TextButton(
-                    onPressed: () {
-                      //
-                    },
-                    child: const Text('ProSpecs')),
+                TextButton(onPressed: () {}, child: const Text('Nike')),
+                TextButton(onPressed: () {}, child: const Text('NewBalance')),
+                TextButton(onPressed: () {}, child: const Text('ProSpecs')),
               ],
             ),
             const Row(
@@ -118,13 +120,17 @@ class _CustomerMainState extends State<CustomerMain> {
                 ),
               ],
             ),
-            Container(
+            SizedBox(
               width: 360,
               height: 510,
-              child: FutureBuilder(
-                future: handler.quaryProduct(),
+              child: FutureBuilder<List<Product>>(
+                future: productsFuture,
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (snapshot.hasData) {
                     return GridView.builder(
                       itemCount: snapshot.data!.length,
                       gridDelegate:
@@ -136,7 +142,7 @@ class _CustomerMainState extends State<CustomerMain> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
-                            Get.to(() => CustomerProduct(), arguments: [
+                            Get.to(() => const CustomerProduct(), arguments: [
                               snapshot.data![index].image,
                               snapshot.data![index].name,
                               snapshot.data![index].price,
@@ -148,65 +154,64 @@ class _CustomerMainState extends State<CustomerMain> {
                             ]);
                           },
                           child: Card(
-                            color: Color(0xffEBE8E8),
+                            color: const Color(0xffEBE8E8),
                             child: Center(
-                                child: Column(
-                              children: [
-                                Image.memory(
-                                  snapshot.data![index].image,
-                                  width: 150,
-                                ),
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 0, 5, 0),
-                                      child: Text(
-                                        snapshot.data![index].brand,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 10),
+                              child: Column(
+                                children: [
+                                  Image.memory(
+                                    snapshot.data![index].image,
+                                    width: 150,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            10, 0, 5, 0),
+                                        child: Text(
+                                          snapshot.data![index].brand,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 10),
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      snapshot.data![index].name,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 0, 5, 0),
-                                      child: Text(
-                                        'Price ',
-                                        style: TextStyle(
+                                      Text(
+                                        snapshot.data![index].name,
+                                        style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 11),
                                       ),
-                                    ),
-                                    Text(
-                                      '${snapshot.data![index].price} ₩',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11,
-                                          color: Color(0xffDCB21C)),
-                                    )
-                                  ],
-                                )
-                              ],
-                            )),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(10, 0, 5, 0),
+                                        child: Text(
+                                          'Price ',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 11),
+                                        ),
+                                      ),
+                                      Text(
+                                        '${snapshot.data![index].price} ₩',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 11,
+                                            color: Color(0xffDCB21C)),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         );
                       },
                     );
                   } else {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    return const Center(child: CircularProgressIndicator());
                   }
                 },
               ),
@@ -218,7 +223,7 @@ class _CustomerMainState extends State<CustomerMain> {
   }
 
   // —Function—
-  reloadData() {
+  void reloadData() {
     setState(() {});
   }
 }

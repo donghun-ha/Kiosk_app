@@ -3,7 +3,6 @@ import 'package:kiosk_app/vm/database_handler.dart';
 
 class KioskDetail extends StatefulWidget {
   final String orderNumber; // 전달받은 주문번호
-
   const KioskDetail({super.key, required this.orderNumber});
 
   @override

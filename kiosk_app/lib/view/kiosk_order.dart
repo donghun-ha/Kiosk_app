@@ -24,7 +24,6 @@ class _KioskOrderState extends State<KioskOrder> {
       body: Center(
         child: Column(
           children: [
-            // 기타 UI 요소들...
             Padding(
               padding: const EdgeInsets.fromLTRB(30, 150, 30, 30),
               child: TextField(
@@ -42,12 +41,11 @@ class _KioskOrderState extends State<KioskOrder> {
               child: ElevatedButton(
                 onPressed: () {
                   String orderNumber = orderController.text.trim(); // 입력값 가져오기
-
                   if (orderNumber.isEmpty) {
                     // 주문번호가 입력되지 않았을 경우
                     Get.snackbar(
-                      '입력 오류', // 제목
-                      '주문번호를 입력해주세요.', // 메시지
+                      '입력 오류',
+                      '주문번호를 입력해주세요.',
                       snackPosition: SnackPosition.TOP,
                       backgroundColor: Colors.red,
                       colorText: Colors.white,

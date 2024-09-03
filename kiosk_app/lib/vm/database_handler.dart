@@ -132,6 +132,13 @@ class DatabaseHandler {
     ]);
   }
 
+  // Future<List<Product>> queryProductByName(String name) async {
+  //   final Database db = await initializeDB();
+  //   final List<Map<String, Object?>> queryResult = await db
+  //       .rawQuery('SELECT * FROM product WHERE name = ? ORDER BY size', [name]);
+  //   return queryResult.map((e) => Product.fromMap(e)).toList();
+  // }
+
   Future<List<Store>> queryStore() async {
     final Database db = await initializeDB();
     final List<Map<String, Object?>> queryResult =

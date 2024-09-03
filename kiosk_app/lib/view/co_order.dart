@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kiosk_app/model/orders.dart';
-import 'package:kiosk_app/view/co_order_detail.dart'; // 상세 정보 페이지로 이동하기 위해 import
+import 'package:kiosk_app/view/co_order_detail.dart';
+import 'package:kiosk_app/vm/database_handler.dart';
 
 class CoOrder extends StatefulWidget {
   const CoOrder({super.key});
@@ -15,68 +16,40 @@ class _CoOrderState extends State<CoOrder> {
   String _searchQuery = ''; // 검색어 상태 변수
   final TextEditingController _searchController =
       TextEditingController(); // 검색 컨트롤러
+  final DatabaseHandler _dbHandler =
+      DatabaseHandler(); // DatabaseHandler 인스턴스 생성
 
   @override
   void initState() {
     super.initState();
-    _orderResults = _fetchExampleOrders(); // 예시 주문 내역 가져오기
+    _orderResults = _fetchOrders(); // 데이터베이스에서 주문 내역 가져오기
   }
 
   void _onSearchChanged(String query) {
     setState(() {
       _searchQuery = query;
-      _orderResults = _fetchFilteredOrders(); // 검색어에 따른 필터링 결과 가져오기
+      _orderResults = _fetchFilteredOrders(query); // 검색어에 따른 필터링 결과 가져오기
     });
   }
 
-  Future<List<Orders>> _fetchExampleOrders() async {
-    // 예시 데이터 생성
-    return [
-      Orders(
-        id: 1,
-        customer_id: '101',
-        product_id: 'a00001250',
-        store_id: '301',
-        date: '2023-09-01 14:30',
-        quantity: 2,
-        total_price: 50000,
-        pickup_date: '2023-09-02',
-        state: 'pending',
-      ),
-      Orders(
-        id: 2,
-        customer_id: '102',
-        product_id: 'a00002255',
-        store_id: '302',
-        date: '2023-09-02 10:15',
-        quantity: 1,
-        total_price: 75000,
-        pickup_date: '2023-09-03',
-        state: 'pending',
-      ),
-      Orders(
-        id: 3,
-        customer_id: '103',
-        product_id: 'a00003265',
-        store_id: '303',
-        date: '2023-09-03 16:45',
-        quantity: 3,
-        total_price: 120000,
-        pickup_date: '2023-09-04',
-        state: 'pending',
-      ),
-    ];
+  Future<List<Orders>> _fetchOrders() async {
+    // 데이터베이스에서 모든 주문을 가져옵니다.
+    final List<Map<String, dynamic>> queryResult =
+        await _dbHandler.queryOrders();
+    // Map 리스트를 Orders 리스트로 변환
+    return queryResult.map((map) => Orders.fromMap(map)).toList();
   }
 
-  Future<List<Orders>> _fetchFilteredOrders() async {
-    List<Orders> allOrders = await _fetchExampleOrders();
-    if (_searchQuery.isEmpty) {
+  Future<List<Orders>> _fetchFilteredOrders(String query) async {
+    // 검색어를 기반으로 필터링된 주문을 가져옵니다.
+    List<Orders> allOrders = await _fetchOrders();
+    if (query.isEmpty) {
       return allOrders;
     } else {
       return allOrders.where((order) {
-        return (order.customer_id.contains(_searchQuery)) ||
-            (order.id?.toString().contains(_searchQuery) ?? false) ||
-            (order.store_id.contains(_searchQuery));
+        return (order.customer_id.contains(query)) ||
+            (order.id.toString().contains(query)) ||
+            (order.store_id.contains(query));
       }).toList();
     }
   }

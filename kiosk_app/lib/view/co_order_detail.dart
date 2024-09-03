@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:kiosk_app/model/orders.dart';
 import 'package:kiosk_app/model/product.dart';
@@ -24,41 +23,11 @@ class _CoOrderDetailState extends State<CoOrderDetail> {
   }
 
   Future<List<Product>> _fetchProductDetails(String productId) async {
-    // 예시 데이터 생성
-    List<Product> exampleProducts = [
-      Product(
-        id: 'a00001250',
-        name: '나이키 에어',
-        size: 250,
-        color: 'white',
-        stock: 2,
-        price: 200000,
-        brand: 'Nike',
-        image: Uint8List(0),
-      ),
-      Product(
-        id: 'a00002255',
-        name: '아디다스 러닝화',
-        size: 255,
-        color: 'black',
-        stock: 5,
-        price: 150000,
-        brand: 'Adidas',
-        image: Uint8List(0),
-      ),
-      Product(
-        id: 'a00003265',
-        name: '프로스펙스 워킹화',
-        size: 265,
-        color: 'gray',
-        stock: 4,
-        price: 130000,
-        brand: 'Prospecs',
-        image: Uint8List(0),
-      ),
-    ];
-
-    return exampleProducts.where((product) => product.id == productId).toList();
+    // 데이터베이스에서 제품 정보를 가져옵니다.
+    final List<Map<String, dynamic>> queryResult = await handler
+        .queryProductById(productId); // productId에 해당하는 제품 정보를 가져옵니다.
+    // Map 리스트를 Product 리스트로 변환
+    return queryResult.map((map) => Product.fromMap(map)).toList();
   }
 
   @override

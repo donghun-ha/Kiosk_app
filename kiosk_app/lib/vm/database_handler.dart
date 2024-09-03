@@ -132,13 +132,6 @@ class DatabaseHandler {
     ]);
   }
 
-  // Future<List<Product>> queryProductByName(String name) async {
-  //   final Database db = await initializeDB();
-  //   final List<Map<String, Object?>> queryResult = await db
-  //       .rawQuery('SELECT * FROM product WHERE name = ? ORDER BY size', [name]);
-  //   return queryResult.map((e) => Product.fromMap(e)).toList();
-  // }
-
   Future<List<Store>> queryStore() async {
     final Database db = await initializeDB();
     final List<Map<String, Object?>> queryResult =
@@ -171,11 +164,15 @@ class DatabaseHandler {
       """);
   }
 
-  Future<int> updateOrderState(int id) async {
-    final Database db = await initializeDB();
-    return await db.rawUpdate("""
-        UPDATE orders SET state = '결제완료' WHERE id = ?
-      """, [id]);
+  Future<int> updateOrderState(int orderId, String newState) async {
+    final Database db = await initializeDB(); // 데이터베이스 초기화
+    int result = await db.update(
+      'orders', // 업데이트할 테이블 이름
+      {'state': newState}, // 업데이트할 데이터
+      where: 'id = ?', // 조건
+      whereArgs: [orderId], // 조건 값
+    );
+    return result; // 업데이트된 행의 개수를 반환
   }
 
   Future<int> deleteOrder(int id) async {
@@ -347,8 +344,8 @@ class DatabaseHandler {
 
   Future<List<Product>> queryproduct() async {
     final Database db = await initializeDB();
-    final List<Map<String, Object?>> //
-        queryResults = await db.rawQuery('select * from product');
+    final List<Map<String, Object?>> queryResults =
+        await db.rawQuery('select * from product');
     if (kDebugMode) {
       print('Query Results: $queryResults');
     }
@@ -546,5 +543,15 @@ class DatabaseHandler {
     ''', [orderNumber]);
 
     return queryResult.map((e) => Product.fromMap(e)).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> queryProductById(String productId) async {
+    final Database db = await initializeDB(); // 데이터베이스 초기화
+    final List<Map<String, dynamic>> result = await db.query(
+      'product', // 제품 테이블
+      where: 'id = ?', // 특정 제품 ID에 대해 조회
+      whereArgs: [productId],
+    );
+    return result;
   }
 } // End

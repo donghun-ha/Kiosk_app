@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:kiosk_app/model/orders.dart';
 import 'package:kiosk_app/model/product.dart';
 import 'package:kiosk_app/vm/database_handler.dart';
@@ -10,7 +10,6 @@ class CoOutDetail extends StatefulWidget {
   const CoOutDetail({super.key, required this.order});
 
   @override
-  // ignore: library_private_types_in_public_api
   _CoOutDetailState createState() => _CoOutDetailState();
 }
 
@@ -25,41 +24,26 @@ class _CoOutDetailState extends State<CoOutDetail> {
   }
 
   Future<List<Product>> _fetchProductDetails(String productId) async {
-    // 예시 데이터 생성
-    List<Product> exampleProducts = [
-      Product(
-        id: 'a00001250',
-        name: '나이키 에어',
-        size: 250,
-        color: 'white',
-        stock: 2,
-        price: 200000,
-        brand: 'Nike',
-        image: Uint8List(0),
-      ),
-      Product(
-        id: 'a00002255',
-        name: '아디다스 러닝화',
-        size: 255,
-        color: 'black',
-        stock: 5,
-        price: 150000,
-        brand: 'Adidas',
-        image: Uint8List(0),
-      ),
-      Product(
-        id: 'a00003265',
-        name: '프로스펙스 워킹화',
-        size: 265,
-        color: 'gray',
-        stock: 4,
-        price: 130000,
-        brand: 'Prospecs',
-        image: Uint8List(0),
-      ),
-    ];
+    // 데이터베이스에서 제품 정보를 가져옵니다.
+    final List<Map<String, dynamic>> queryResult =
+        await handler.queryProductById(productId);
+    // Map 리스트를 Product 리스트로 변환
+    return queryResult.map((map) => Product.fromMap(map)).toList();
+  }
 
-    return exampleProducts.where((product) => product.id == productId).toList();
+  Future<void> _updateOrderState() async {
+    // 주문 상태 업데이트
+    await handler.updateOrderState(widget.order.id!, '출고 완료');
+    setState(() {
+      widget.order.state = '출고 완료'; // 상태를 로컬에서도 업데이트
+    });
+    Get.snackbar(
+      '상태 업데이트',
+      '주문 상태가 "출고 완료"로 업데이트되었습니다.',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
   }
 
   @override
@@ -111,8 +95,7 @@ class _CoOutDetailState extends State<CoOutDetail> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('픽업매장: ${widget.order.store_id}'),
-                  //?? 'N/A'
-                  Text('배송상태: ${_getDeliveryStatus(widget.order.pickup_date)}'),
+                  Text('배송상태: ${widget.order.state}'),
                 ],
               ),
             ),
@@ -147,9 +130,7 @@ class _CoOutDetailState extends State<CoOutDetail> {
             ),
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                  // 출고 완료 버튼 클릭 시 로직 추가
-                },
+                onPressed: _updateOrderState,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff5C4B91),
                   shape: RoundedRectangleBorder(
@@ -208,19 +189,5 @@ class _CoOutDetailState extends State<CoOutDetail> {
         ],
       ),
     );
-  }
-
-  // 배송 상태를 계산하는 함수
-  String _getDeliveryStatus(String? pickupDate) {
-    if (pickupDate == null || pickupDate.isEmpty) {
-      return '출고 전';
-    } else {
-      DateTime pickup = DateTime.parse(pickupDate);
-      if (pickup.isBefore(DateTime.now())) {
-        return '배송 완료';
-      } else {
-        return '배송 중';
-      }
-    }
   }
 }

@@ -132,6 +132,13 @@ class DatabaseHandler {
     ]);
   }
 
+  // Future<List<Product>> queryProductByName(String name) async {
+  //   final Database db = await initializeDB();
+  //   final List<Map<String, Object?>> queryResult = await db
+  //       .rawQuery('SELECT * FROM product WHERE name = ? ORDER BY size', [name]);
+  //   return queryResult.map((e) => Product.fromMap(e)).toList();
+  // }
+
   Future<List<Store>> queryStore() async {
     final Database db = await initializeDB();
     final List<Map<String, Object?>> queryResult =
@@ -157,7 +164,7 @@ class DatabaseHandler {
   Future<List<Map<String, dynamic>>> queryOrders() async {
     final Database db = await initializeDB();
     return await db.rawQuery("""
-        SELECT orders.id, product.image, product.name, product.brand, orders.total_price, orders.quantity, store.name AS sname, orders.state, product.color, product.size, orders.date
+        SELECT orders.id, product.image, product.name, product.brand, orders.total_price, orders.quantity, store.name AS sname, orders.state, product.color, product.size, orders.date, orders.customer_id
         FROM orders
         INNER JOIN product ON orders.product_id = product.id
         INNER JOIN store ON orders.store_id = store.id
@@ -446,7 +453,7 @@ class DatabaseHandler {
     }
   }
 
-  Future<Map<String, dynamic>> getOrderById(String orderId) async {
+  Future<Map<String, dynamic>> getOrderById(int orderId) async {
     final db = await initializeDB();
     final List<Map<String, dynamic>> result = await db.query(
       'orders',
@@ -531,18 +538,17 @@ class DatabaseHandler {
   }
 
   // 키오스크
-  Future<List<Product>> queryOrderProducts(String orderNumber) async {
+  Future<List<Map<String, dynamic>>> queryOrderProducts(
+      String orderNumber) async {
     final Database db = await initializeDB();
-
-    // 주문 번호에 해당하는 제품 정보를 가져오는 쿼리
     final List<Map<String, dynamic>> queryResult = await db.rawQuery('''
-      SELECT p.id, p.name, p.brand, p.color, p.size, p.price, p.stock, p.image
-      FROM orders o
-      INNER JOIN product p ON o.product_id = p.id
-      WHERE o.id = ?
-    ''', [orderNumber]);
+    SELECT p.id, p.name, p.brand, p.color, p.size, p.price, p.stock, p.image, o.quantity
+    FROM orders o
+    INNER JOIN product p ON o.product_id = p.id
+    WHERE o.id = ?
+  ''', [orderNumber]);
 
-    return queryResult.map((e) => Product.fromMap(e)).toList();
+    return queryResult;
   }
 
   Future<List<Map<String, dynamic>>> queryProductById(String productId) async {

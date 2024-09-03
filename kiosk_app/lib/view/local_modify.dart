@@ -104,7 +104,7 @@ class LocalModifyPage extends GetView<LocalModifyController> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Get.to(() => LocalPasswordPage());
+                Get.to(() => const LocalPasswordPage());
               },
               child: const Text('비밀번호 변경'),
             ),

@@ -46,7 +46,7 @@ class _CustomerMainState extends State<CustomerMain> {
   void _initializeDatabase() async {
     await handler.initializeDB(); // 데이터베이스 초기화
     setState(() {
-      productsFuture = handler.quaryProduct(); // Future 설정 후 상태 업데이트
+      productsFuture = handler.queryProduct(); // Future 설정 후 상태 업데이트
     });
   }
 

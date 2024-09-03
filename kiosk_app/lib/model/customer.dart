@@ -20,4 +20,14 @@ class Customer {
         phone = res['phone'],
         password = res['password'],
         image = res['image'];
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'phone': phone,
+      'password': password,
+      'image': image,
+    };
+  }
 }

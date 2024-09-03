@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -533,4 +532,19 @@ class DatabaseHandler {
         await db.rawQuery('SELECT * FROM customer WHERE id = ?', [customer.id]);
     return queryResults.map((e) => Customer.fromMap(e)).toList();
   }
-}// End
+
+  // 키오스크
+  Future<List<Product>> queryOrderProducts(String orderNumber) async {
+    final Database db = await initializeDB();
+
+    // 주문 번호에 해당하는 제품 정보를 가져오는 쿼리
+    final List<Map<String, dynamic>> queryResult = await db.rawQuery('''
+      SELECT p.id, p.name, p.brand, p.color, p.size, p.price, p.stock, p.image
+      FROM orders o
+      INNER JOIN product p ON o.product_id = p.id
+      WHERE o.id = ?
+    ''', [orderNumber]);
+
+    return queryResult.map((e) => Product.fromMap(e)).toList();
+  }
+} // End

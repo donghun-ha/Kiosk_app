@@ -65,9 +65,9 @@ class LocalProfilePage extends StatelessWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                Get.to(() => LocalModifyPage());
+                Get.to(() => const LocalModifyPage());
               },
-              child: Text('프로필 수정'),
+              child: const Text('프로필 수정'),
             ),
             const SizedBox(height: 20),
             ListTile(

@@ -41,10 +41,10 @@ class LocalInventDetailController extends GetxController {
       try {
         return '${int.parse(price).toStringAsFixed(0)}원';
       } catch (e) {
-        return '${price}원';
+        return '$price원';
       }
     }
-    return '${price}원';
+    return '$price원';
   }
 }
 

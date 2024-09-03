@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:kiosk_app/vm/database_handler.dart';
 
 class KioskDetail extends StatefulWidget {
-  const KioskDetail({super.key});
+  final String orderNumber; // 전달받은 주문번호
+
+  const KioskDetail({super.key, required this.orderNumber});
 
   @override
   State<KioskDetail> createState() => _KioskDetailState();
@@ -24,7 +26,8 @@ class _KioskDetailState extends State<KioskDetail> {
         ),
       ),
       body: FutureBuilder(
-        future: handler.queryProduct(), // 나중에 오더 함수로 바꿔줘야함.
+        future:
+            handler.queryOrderProducts(widget.orderNumber), // 주문 번호에 맞는 제품들 조회
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return GridView.builder(
@@ -73,6 +76,10 @@ class _KioskDetailState extends State<KioskDetail> {
                 );
               },
             );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
           } else {
             return const Center(
               child: CircularProgressIndicator(),
@@ -83,26 +90,3 @@ class _KioskDetailState extends State<KioskDetail> {
     );
   }
 }
-      // Padding(
-      //   padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
-      //   child: ElevatedButton(
-      //     onPressed: () {
-      //       // Alert
-      //     },
-      //     style: ElevatedButton.styleFrom(
-      //       backgroundColor: Colors.black,
-      //       foregroundColor: Colors.white,
-      //       shape: RoundedRectangleBorder(
-      //         borderRadius: BorderRadius.circular(8),
-      //       ),
-      //       fixedSize: const Size(300, 60),
-      //     ),
-      //     child: const Text(
-      //       '제품 수령하기',
-      //       style: TextStyle(
-      //         fontSize: 20,
-      //         fontWeight: FontWeight.bold,
-      //       ),
-      //     ),
-      //   ),
-      // ),

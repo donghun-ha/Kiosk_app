@@ -78,7 +78,7 @@ class LocalMain extends GetView<LocalMainController> {
                           style: const TextStyle(
                               fontSize: 34, fontWeight: FontWeight.bold),
                         )),
-                    SizedBox(height: 76),
+                    const SizedBox(height: 76),
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
@@ -92,7 +92,8 @@ class LocalMain extends GetView<LocalMainController> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('픽업 신청', style: TextStyle(fontSize: 18)),
+                                const Text('픽업 신청',
+                                    style: TextStyle(fontSize: 18)),
                                 Obx(() => Text(
                                       '${controller.pickupRequestCount.value} 건',
                                       style: const TextStyle(
@@ -109,7 +110,8 @@ class LocalMain extends GetView<LocalMainController> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('당일 픽업', style: TextStyle(fontSize: 18)),
+                                const Text('당일 픽업',
+                                    style: TextStyle(fontSize: 18)),
                                 Obx(() => Text(
                                       '${controller.todayPickupCount.value} 건',
                                       style: const TextStyle(

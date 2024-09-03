@@ -26,6 +26,8 @@ class LocalPasswordController extends GetxController {
 }
 
 class LocalPasswordPage extends GetView<LocalPasswordController> {
+  const LocalPasswordPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(LocalPasswordController());

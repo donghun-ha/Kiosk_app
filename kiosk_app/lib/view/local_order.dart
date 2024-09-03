@@ -68,7 +68,8 @@ class LocalOrderPage extends GetView<LocalOrderController> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LocalProfilePage()),
+                MaterialPageRoute(
+                    builder: (context) => const LocalProfilePage()),
               );
             },
           ),

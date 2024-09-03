@@ -51,6 +51,8 @@ class LocalModifyController extends GetxController {
 }
 
 class LocalModifyPage extends GetView<LocalModifyController> {
+  const LocalModifyPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(LocalModifyController());
@@ -119,4 +121,4 @@ class LocalModifyPage extends GetView<LocalModifyController> {
 }
 
 // 웹 지원을 위한 전역 변수
-final bool kIsWeb = identical(0, 0.0);
+const bool kIsWeb = identical(0, 0.0);

@@ -150,7 +150,7 @@ class _TestinsertState extends State<Testinsert> {
     var productInsert = Product(
         id: idController.text.trim(),
         name: nameController.text.trim(),
-        size: int.parse(sizeController.text.trim()),
+        size: sizeController.text.trim(),
         color: colorController.text.trim(),
         stock: int.parse(stockController.text.trim()),
         price: int.parse(priceController.text.trim()),

@@ -149,7 +149,7 @@ class _CoOrderState extends State<CoOrder> {
                                   ),
                                   const SizedBox(height: 5),
                                   Text(
-                                    '회원 번호: ${order.customer_id}',
+                                    '회원 ID: ${order.customer_id}',
                                     style: const TextStyle(
                                       fontSize: 14,
                                     ),

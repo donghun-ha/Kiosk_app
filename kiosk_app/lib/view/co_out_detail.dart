@@ -24,26 +24,56 @@ class _CoOutDetailState extends State<CoOutDetail> {
   }
 
   Future<List<Product>> _fetchProductDetails(String productId) async {
-    // 데이터베이스에서 제품 정보를 가져옵니다.
-    final List<Map<String, dynamic>> queryResult =
-        await handler.queryProductById(productId);
-    // Map 리스트를 Product 리스트로 변환
-    return queryResult.map((map) => Product.fromMap(map)).toList();
+    try {
+      final List<Map<String, dynamic>> queryResult =
+          await handler.queryProductById(productId);
+      return queryResult.map((map) => Product.fromMap(map)).toList();
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to fetch product details: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return [];
+    }
   }
 
   Future<void> _updateOrderState() async {
-    // 주문 상태 업데이트
-    await handler.updateOrderState(widget.order.id!, '출고 완료');
-    setState(() {
-      widget.order.state = '출고 완료'; // 상태를 로컬에서도 업데이트
-    });
-    Get.snackbar(
-      '상태 업데이트',
-      '주문 상태가 "출고 완료"로 업데이트되었습니다.',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-    );
+    if (widget.order.id == null) {
+      Get.snackbar(
+        'Error',
+        '주문 ID가 없습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    try {
+      // Assuming updateOrderState expects an int
+      await handler.updateOrderState(widget.order.id!, '출고 완료');
+      setState(() {
+        widget.order.state = '출고 완료';
+      });
+      Get.snackbar(
+        '상태 업데이트',
+        '주문 상태가 "출고 완료"로 업데이트되었습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        '주문 상태 업데이트 실패: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
   @override
@@ -84,21 +114,7 @@ class _CoOutDetailState extends State<CoOutDetail> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('픽업매장: ${widget.order.store_id}'),
-                  Text('배송상태: ${widget.order.state}'),
-                ],
-              ),
-            ),
+            _buildOrderInfo(),
             const SizedBox(height: 20),
             Expanded(
               child: FutureBuilder<List<Product>>(
@@ -114,14 +130,14 @@ class _CoOutDetailState extends State<CoOutDetail> {
                     return Column(
                       children: [
                         _buildProductTableHeader(),
-                        for (var product in snapshot.data!)
-                          _buildProductTableRow(
-                            product.id,
-                            product.color,
-                            product.name,
-                            product.size.toString(),
-                            product.stock.toString(),
-                          ),
+                        ...snapshot.data!
+                            .map((product) => _buildProductTableRow(
+                                  product.id,
+                                  product.color,
+                                  product.name,
+                                  product.size.toString(),
+                                  product.stock.toString(),
+                                )),
                       ],
                     );
                   }
@@ -147,6 +163,24 @@ class _CoOutDetailState extends State<CoOutDetail> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildOrderInfo() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.green.shade50,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('픽업매장: ${widget.order.store_id}'),
+          Text('배송상태: ${widget.order.state}'),
+        ],
       ),
     );
   }

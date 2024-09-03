@@ -102,7 +102,7 @@ class _CustomerPaymentState extends State<CustomerPayment> {
               width: 360,
               height: 550,
               child: FutureBuilder(
-                future: handler.quaryOrders(),
+                future: handler.queryOrders(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(

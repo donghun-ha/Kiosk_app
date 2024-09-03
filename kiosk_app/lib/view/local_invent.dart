@@ -5,7 +5,14 @@ import 'package:kiosk_app/vm/database_handler.dart';
 import 'package:kiosk_app/view/local_invent_detail.dart';
 import 'package:kiosk_app/view/local_profile.dart';
 
-class LocalInventController extends GetxController {
+class LocalInventPage extends StatefulWidget {
+  const LocalInventPage({super.key});
+
+  @override
+  _LocalInventPageState createState() => _LocalInventPageState();
+}
+
+class _LocalInventPageState extends State<LocalInventPage> {
   final DatabaseHandler _databaseHandler = DatabaseHandler();
   final searchController = TextEditingController();
   final RxList<Map<String, dynamic>> products = <Map<String, dynamic>>[].obs;
@@ -15,8 +22,8 @@ class LocalInventController extends GetxController {
   final RxBool isLoading = true.obs;
 
   @override
-  void onInit() {
-    super.onInit();
+  void initState() {
+    super.initState();
     loadProducts();
   }
 
@@ -52,22 +59,16 @@ class LocalInventController extends GetxController {
     if (price is num) return '${price.toStringAsFixed(2)}원';
     if (price is String) {
       try {
-        return '${double.parse(price).toStringAsFixed(2)}원';
+        return '${double.parse(price.replaceAll(',', '')).toStringAsFixed(2)}원';
       } catch (e) {
         return '$price원';
       }
     }
     return '$price원';
   }
-}
-
-class LocalInventPage extends GetView<LocalInventController> {
-  const LocalInventPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(LocalInventController());
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFF0FFF5),
@@ -89,19 +90,19 @@ class LocalInventPage extends GetView<LocalInventController> {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: controller.searchController,
+                    controller: searchController,
                     decoration: InputDecoration(
-                      labelText: '${controller.searchType.value} 검색',
+                      labelText: '${searchType.value} 검색',
                       suffixIcon: const Icon(Icons.search),
                     ),
-                    onChanged: controller.filterProducts,
+                    onChanged: filterProducts,
                   ),
                 ),
                 PopupMenuButton<String>(
                   icon: const Icon(Icons.arrow_drop_down),
                   onSelected: (String value) {
-                    controller.searchType.value = value;
-                    controller.filterProducts(controller.searchController.text);
+                    searchType.value = value;
+                    filterProducts(searchController.text);
                   },
                   itemBuilder: (BuildContext context) => [
                     const PopupMenuItem(value: '제품명', child: Text('제품명')),
@@ -113,9 +114,9 @@ class LocalInventPage extends GetView<LocalInventController> {
           ),
           Expanded(
             child: Obx(() {
-              if (controller.isLoading.value) {
+              if (isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (controller.filteredProducts.isEmpty) {
+              } else if (filteredProducts.isEmpty) {
                 return const Center(child: Text('검색 결과가 없습니다'));
               } else {
                 return GridView.builder(
@@ -126,9 +127,9 @@ class LocalInventPage extends GetView<LocalInventController> {
                     mainAxisSpacing: 5,
                   ),
                   padding: const EdgeInsets.all(35),
-                  itemCount: controller.filteredProducts.length,
+                  itemCount: filteredProducts.length,
                   itemBuilder: (context, index) {
-                    final product = controller.filteredProducts[index];
+                    final product = filteredProducts[index];
                     return GestureDetector(
                       onTap: () {
                         Get.to(() => LocalInventDetailPage(
@@ -141,7 +142,7 @@ class LocalInventPage extends GetView<LocalInventController> {
                           children: [
                             Expanded(
                               child: FutureBuilder<Uint8List?>(
-                                future: controller._databaseHandler
+                                future: _databaseHandler
                                     .getProductImage(product['id'].toString()),
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState ==
@@ -180,7 +181,7 @@ class LocalInventPage extends GetView<LocalInventController> {
                                   Text(
                                       '총 재고: ${product['total_stock'] ?? 'N/A'}'),
                                   Text(
-                                      '평균 가격: ${controller.formatPrice(product['avg_price'])}'),
+                                      '평균 가격: ${formatPrice(product['avg_price'])}'),
                                 ],
                               ),
                             ),

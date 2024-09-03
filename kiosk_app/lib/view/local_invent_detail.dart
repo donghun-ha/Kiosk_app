@@ -39,7 +39,7 @@ class LocalInventDetailController extends GetxController {
     }
     if (price is String) {
       try {
-        return '${int.parse(price).toStringAsFixed(0)}원';
+        return '${int.parse(price.replaceAll(',', '')).toStringAsFixed(0)}원';
       } catch (e) {
         return '$price원';
       }
@@ -48,15 +48,17 @@ class LocalInventDetailController extends GetxController {
   }
 }
 
-class LocalInventDetailPage extends GetView<LocalInventDetailController> {
+class LocalInventDetailPage extends StatelessWidget {
   final String productName;
 
-  LocalInventDetailPage({super.key, required this.productName}) {
-    Get.put(LocalInventDetailController(productName: productName));
-  }
+  LocalInventDetailPage({super.key, required this.productName});
 
   @override
   Widget build(BuildContext context) {
+    final LocalInventDetailController controller = Get.put(
+      LocalInventDetailController(productName: productName),
+    );
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFF0FFF5),

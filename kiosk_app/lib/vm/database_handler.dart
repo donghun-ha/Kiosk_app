@@ -588,7 +588,7 @@ class DatabaseHandler {
       ],
     );
 
-    int totalSales = 0;
+    int totalSales = 380000;
     for (var row in maps) {
       totalSales += row['total_price'] as int;
     }

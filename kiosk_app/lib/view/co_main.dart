@@ -4,6 +4,7 @@ import 'package:kiosk_app/view/co_order.dart';
 import 'package:kiosk_app/view/co_out.dart';
 import 'package:kiosk_app/view/co_product.dart';
 import 'package:kiosk_app/view/co_sales.dart';
+import 'package:kiosk_app/vm/database_handler.dart';
 
 class CoMain extends StatefulWidget {
   const CoMain({super.key});
@@ -13,6 +14,15 @@ class CoMain extends StatefulWidget {
 }
 
 class _CoMainState extends State<CoMain> {
+  late DatabaseHandler handler = DatabaseHandler();
+  String state = '출고 완료';
+  DateTime date = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,24 +84,43 @@ class _CoMainState extends State<CoMain> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             '미출고 건',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Text(
-                            '___건',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          FutureBuilder<int>(
+                            future: handler.getPendingOrdersCount(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return const Text(
+                                  '오류 발생',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                );
+                              } else {
+                                // 정상적으로 데이터를 받아온 경우
+                                return Text(
+                                  '${snapshot.data}건',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                );
+                              }
+                            },
                           ),
                         ],
                       ),
@@ -105,24 +134,43 @@ class _CoMainState extends State<CoMain> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        const Text(
                           '일 매출',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        Text(
-                          '__________원',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        FutureBuilder<int>(
+                          future:
+                              handler.getDailySales('결제 완료', DateTime.now()),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return const Text(
+                                '매출 없음',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              );
+                            } else {
+                              return Text(
+                                '${snapshot.data} 원',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -233,6 +281,12 @@ class _CoMainState extends State<CoMain> {
               ),
             ],
           ),
+          // ElevatedButton(
+          //   onPressed: () {
+          //     insertSampleData(); // 버튼 클릭 시 예제 데이터 삽입
+          //   },
+          //   child: const Text('예제 데이터 삽입'),
+          // ),
         ],
       ),
     );

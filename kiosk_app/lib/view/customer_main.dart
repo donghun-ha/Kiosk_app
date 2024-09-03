@@ -224,6 +224,8 @@ class _CustomerMainState extends State<CustomerMain> {
 
   // —Function—
   void reloadData() {
-    setState(() {});
+    setState(() {
+      productsFuture = handler.quaryProduct();
+    });
   }
 }

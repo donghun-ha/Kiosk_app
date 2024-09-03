@@ -148,8 +148,10 @@ class DatabaseHandler {
       order.customer_id,
       order.product_id,
       order.store_id,
+      order.date,
       order.quantity,
       order.total_price,
+      order.pickup_date,
       order.state
     ]);
   }
@@ -554,4 +556,37 @@ class DatabaseHandler {
     );
     return result;
   }
-} // End
+
+  Future<int> getPendingOrdersCount() async {
+    final Database db = await initializeDB();
+    final List<Map<String, dynamic>> maps = await db.query(
+      'orders',
+      where: 'state = ?',
+      whereArgs: ['출고 완료'],
+    );
+    return maps.length;
+  }
+
+  Future<int> getDailySales(String state, DateTime date) async {
+    final Database db = await initializeDB();
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'orders',
+      where: 'state = ? AND date BETWEEN ? AND ?',
+      whereArgs: [
+        state,
+        startOfDay.toIso8601String(),
+        endOfDay.toIso8601String()
+      ],
+    );
+
+    int totalSales = 0;
+    for (var row in maps) {
+      totalSales += row['total_price'] as int;
+    }
+
+    return totalSales;
+  }
+} // End 

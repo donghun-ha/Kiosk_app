@@ -9,14 +9,14 @@ class CustomerCart extends StatefulWidget {
 }
 
 class _CustomerCartState extends State<CustomerCart> {
+  late int orderId;
   late DatabaseHandler handler;
-  late Future<List<Map<String, dynamic>>> _ordersFuture;
 
   @override
   void initState() {
     super.initState();
     handler = DatabaseHandler();
-    _ordersFuture = handler.quaryOrders();
+    orderId = 0;
   }
 
   @override
@@ -31,111 +31,104 @@ class _CustomerCartState extends State<CustomerCart> {
           style: TextStyle(fontWeight: FontWeight.w500, fontSize: 30),
         ),
       ),
-      body: Center(
-        child: FutureBuilder<List<Map<String, dynamic>>>(
-          future: _ordersFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Text('No orders available');
-            } else {
-              final latestOrder = snapshot.data!.last;
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Image.memory(
-                    latestOrder['image'],
-                    width: 400,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${latestOrder['brand']} ',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        latestOrder['name'],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    latestOrder['color'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    '${latestOrder['size']}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    '총 수량 : ${latestOrder['quantity']}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    '주문일 : ${latestOrder['date']}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    '총 금액 : ${latestOrder['total_price']}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xffDCB21C),
-                    ),
-                  ),
-                  Text(
-                    '수령지점 : ${latestOrder['sname']}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 110, 0, 0),
-                    child: SizedBox(
-                      width: 300,
-                      height: 45,
-                      child: ElevatedButton(
-                        onPressed: () => _updateOrder(latestOrder['id']),
-                        style: ElevatedButton.styleFrom(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              FutureBuilder(
+                future: handler.quaryOrders(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    orderId = snapshot.data![snapshot.data!.length - 1]['id'];
+                    return Column(
+                      children: [
+                        Image.memory(
+                          snapshot.data![snapshot.data!.length - 1]['image'],
+                          width: 400,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              snapshot.data![snapshot.data!.length - 1]
+                                  ['brand'],
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              snapshot.data![snapshot.data!.length - 1]['name'],
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          snapshot.data![snapshot.data!.length - 1]['color'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${snapshot.data![snapshot.data!.length - 1]['size']}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '총 수량 : ${snapshot.data![snapshot.data!.length - 1]['quantity']}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '주문일 : ${snapshot.data![snapshot.data!.length - 1]['date']}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '총 금액 : ${snapshot.data![snapshot.data!.length - 1]['total_price']}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xffDCB21C)),
+                        ),
+                        Text(
+                          '수령지점 : ${snapshot.data![snapshot.data!.length - 1]['sname']}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 110, 0, 0),
+                child: SizedBox(
+                  width: 300,
+                  height: 45,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        getprice(orderId);
+                        setState(() {});
+                      },
+                      style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff6644AB),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          'Checkout',
-                          style: TextStyle(
+                              borderRadius: BorderRadius.circular(10))),
+                      child: const Text(
+                        'Checkout',
+                        style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }
-          },
+                            fontSize: 20),
+                      )),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Future<void> _updateOrder(int id) async {
-    try {
-      await handler.updateOrders(id);
-      setState(() {
-        _ordersFuture = handler.quaryOrders(); // Refresh orders
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Order updated successfully')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update order: $e')),
-      );
-    }
+  Future getprice(int id) async {
+    await handler.updateOrders(id);
   }
 }

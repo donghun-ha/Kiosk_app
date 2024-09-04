@@ -10,9 +10,6 @@ class CustomerPayment extends StatefulWidget {
 
 class _CustomerPaymentState extends State<CustomerPayment> {
   late DatabaseHandler handler;
-  late List<String> shoeName;
-  late List<String> shoePrice;
-  late List<String> shoeImage;
   late List<Color> buttonColor;
   late Color firstButtonColor;
   late Color secondButtonColor;
@@ -22,9 +19,6 @@ class _CustomerPaymentState extends State<CustomerPayment> {
   void initState() {
     super.initState();
     handler = DatabaseHandler();
-    shoeName = ['나이키 에어'];
-    shoePrice = ['100000'];
-    shoeImage = ['사진'];
     count = 1;
     buttonColor = [
       const Color(0xff6644AB),
@@ -102,7 +96,7 @@ class _CustomerPaymentState extends State<CustomerPayment> {
               width: 360,
               height: 550,
               child: FutureBuilder(
-                future: handler.queryOrders(),
+                future: handler.quaryOrders(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
@@ -110,62 +104,58 @@ class _CustomerPaymentState extends State<CustomerPayment> {
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
                         if (snapshot.data![index]['state'] == '결제완료') {
-                          return Container(
-                            child: Row(
-                              children: [
-                                Column(
-                                  children: [
-                                    Container(
+                          return Row(
+                            children: [
+                              Column(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: const Color(0xffE4E4E4),
+                                    ),
+                                    child: Center(
+                                        child: Image.memory(
+                                      snapshot.data![index]['image'],
                                       width: 100,
-                                      height: 100,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: const Color(0xffE4E4E4),
-                                      ),
-                                      child: Center(
-                                          child: Image.memory(
-                                        snapshot.data![index]['image'],
-                                        width: 100,
-                                      )),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              10, 0, 5, 0),
-                                          child: Text(
-                                            snapshot.data![index]['brand'],
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15),
-                                          ),
-                                        ),
-                                        Text(
-                                          snapshot.data![index]['name'],
+                                    )),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            10, 0, 5, 0),
+                                        child: Text(
+                                          snapshot.data![index]['brand'],
                                           style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15),
                                         ),
-                                      ],
-                                    ),
-                                    Text(snapshot.data![index]['sname']),
-                                    Text(
-                                        '${snapshot.data![index]['total_price']}'),
-                                    Text(
-                                        '수량 : ${snapshot.data![index]['quantity']}'),
-                                  ],
-                                )
-                              ],
-                            ),
+                                      ),
+                                      Text(
+                                        snapshot.data![index]['name'],
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(snapshot.data![index]['sname']),
+                                  Text(
+                                      '${snapshot.data![index]['total_price']}'),
+                                  Text(
+                                      '수량 : ${snapshot.data![index]['quantity']}'),
+                                ],
+                              )
+                            ],
                           );
                         } else {
-                          return const Center(
-                            child: Text('data 없음'),
-                          );
+                          return const Center();
                         }
                       },
                     );

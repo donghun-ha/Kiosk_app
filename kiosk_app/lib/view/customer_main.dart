@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kiosk_app/model/product.dart';
@@ -19,8 +21,19 @@ class _CustomerMainState extends State<CustomerMain> {
   late List<String> storeName;
   late List<String> storeAddress;
   late List<String> list;
+  late List<String> duplicationbrand;
+  late List<String> duplicationname;
+  late List<int> duplicationprice;
+  late List<Uint8List> duplicationimage;
+  late List<String> duplicationFinalbrand;
+  late List<String> duplicationFinalname;
+  late List<int> duplicationFinalprice;
+  late List<Uint8List> duplicationFinalimage;
+  late List<int> checkName;
   late DatabaseHandler handler;
   late Future<List<Product>> productsFuture;
+  late int countNum;
+  late List<String> shoeId;
 
   @override
   void initState() {
@@ -28,6 +41,18 @@ class _CustomerMainState extends State<CustomerMain> {
     handler = DatabaseHandler(); // 먼저 DatabaseHandler를 초기화
     productsFuture = Future.value([]); // Future의 초기값 설정
     _initializeDatabase(); // 그 다음에 데이터베이스 초기화
+    countNum = 0;
+    duplicationbrand = [];
+    duplicationname = [];
+    duplicationprice = [];
+    duplicationimage = [];
+    shoeId = [];
+    checkName = [];
+
+    duplicationFinalbrand = [];
+    duplicationFinalname = [];
+    duplicationFinalprice = [];
+    duplicationFinalimage = [];
 
     list = ['1', '2', '3', '3', '3'];
     storeId = [
@@ -46,7 +71,7 @@ class _CustomerMainState extends State<CustomerMain> {
   void _initializeDatabase() async {
     await handler.initializeDB(); // 데이터베이스 초기화
     setState(() {
-      productsFuture = handler.queryProduct(); // Future 설정 후 상태 업데이트
+      productsFuture = handler.quaryProduct(); // Future 설정 후 상태 업데이트
     });
   }
 
@@ -131,8 +156,35 @@ class _CustomerMainState extends State<CustomerMain> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
+                    for(int i = 0; i < snapshot.data!.length; i++){
+                      duplicationbrand.add(snapshot.data![i].brand);
+                      duplicationname.add(snapshot.data![i].name);
+                      duplicationprice.add(snapshot.data![i].price);
+                      if(i == 0){
+                        duplicationimage.add(snapshot.data![i].image);
+                        checkName.add(i);
+                      }else if(i >= 1){
+                        if(snapshot.data![i].name != snapshot.data![i-1].name){
+                          duplicationimage.add(snapshot.data![i].image);
+                        checkName.add(i);
+                      }
+                      }
+                      // duplicationimage.add(snapshot.data![i].image);
+                      shoeId.add(snapshot.data![i].id);
+                    }
+                    // for(int i = 0; i < checkName.length; i++){
+                    //   for(int num = 0; num < snapshot.data!.length; num++){
+                    //     if(snapshot.data![checkName[i]].name == snapshot.data![num].name){
+
+                    //     }
+                    //   }
+                    // }
+                    duplicationFinalbrand = duplicationbrand.toSet().toList();
+                    duplicationFinalname = duplicationname.toSet().toList();
+                    duplicationFinalprice = duplicationprice.toSet().toList();
+                    duplicationFinalimage = duplicationimage.toSet().toList();
                     return GridView.builder(
-                      itemCount: snapshot.data!.length,
+                      itemCount: duplicationFinalname.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -142,16 +194,14 @@ class _CustomerMainState extends State<CustomerMain> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
+                            countNum = index;
+                            print(snapshot.data![index].id);
+                            print(duplicationFinalname);
+                            print(duplicationFinalimage.length);
                             Get.to(() => const CustomerProduct(), arguments: [
-                              snapshot.data![index].image,
-                              snapshot.data![index].name,
-                              snapshot.data![index].price,
-                              snapshot.data![index].brand,
-                              snapshot.data![index].id,
-                              snapshot.data![index].size,
-                              snapshot.data![index].stock,
-                              snapshot.data![index].color,
-                            ]);
+                              countNum,
+                              shoeId
+                            ])!.then((value) => reloadData(),);
                           },
                           child: Card(
                             color: const Color(0xffEBE8E8),
@@ -159,7 +209,7 @@ class _CustomerMainState extends State<CustomerMain> {
                               child: Column(
                                 children: [
                                   Image.memory(
-                                    snapshot.data![index].image,
+                                    duplicationFinalimage[index],
                                     width: 150,
                                   ),
                                   Row(
@@ -168,14 +218,14 @@ class _CustomerMainState extends State<CustomerMain> {
                                         padding: const EdgeInsets.fromLTRB(
                                             10, 0, 5, 0),
                                         child: Text(
-                                          snapshot.data![index].brand,
+                                          duplicationFinalbrand[index],
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 10),
                                         ),
                                       ),
                                       Text(
-                                        snapshot.data![index].name,
+                                        duplicationFinalname[index],
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 11),
@@ -195,7 +245,7 @@ class _CustomerMainState extends State<CustomerMain> {
                                         ),
                                       ),
                                       Text(
-                                        '${snapshot.data![index].price} ₩',
+                                        '${duplicationFinalprice[index]} ₩',
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 11,
@@ -224,8 +274,6 @@ class _CustomerMainState extends State<CustomerMain> {
 
   // —Function—
   void reloadData() {
-    setState(() {
-      productsFuture = handler.quaryProduct();
-    });
+    setState(() {productsFuture = handler.quaryProduct();});
   }
 }

@@ -59,9 +59,8 @@ class _CoSalesState extends State<CoSales> {
                       color: Theme.of(context).colorScheme.primary,
                       name: 'Brand',
                       dataSource: snapshot.data!,
-                      xValueMapper: (Product product, _) =>
-                          product.brand ?? 'Unknown',
-                      yValueMapper: (Product product, _) => product.price ?? 0,
+                      xValueMapper: (Product product, _) => product.brand,
+                      yValueMapper: (Product product, _) => product.price,
                       dataLabelSettings:
                           const DataLabelSettings(isVisible: true),
                       enableTooltip: true,

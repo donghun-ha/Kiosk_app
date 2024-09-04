@@ -13,7 +13,7 @@ class CoOrder extends StatefulWidget {
 
 class _CoOrderState extends State<CoOrder> {
   late Future<List<Orders>> _orderResults;
-  String _searchQuery = ''; // 검색어 상태 변수
+  String searchQuery = ''; // 검색어 상태 변수
   final TextEditingController _searchController =
       TextEditingController(); // 검색 컨트롤러
   final DatabaseHandler _dbHandler =
@@ -27,7 +27,7 @@ class _CoOrderState extends State<CoOrder> {
 
   void _onSearchChanged(String query) {
     setState(() {
-      _searchQuery = query;
+      searchQuery = query;
       _orderResults = _fetchFilteredOrders(query); // 검색어에 따른 필터링 결과 가져오기
     });
   }

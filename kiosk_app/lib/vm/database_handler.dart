@@ -286,10 +286,11 @@ class DatabaseHandler {
     return result;
   }
 
-  Future<List<Product>> quaryProductsize(String name) async {
+  Future<List<Product>> quaryProductsize(String name, String color) async {
     final Database db = await initializeDB();
-    final List<Map<String, Object?>> queryResult = await db
-        .rawQuery('select * from product where name = ? order by size', [name]);
+    final List<Map<String, Object?>> queryResult = await db.rawQuery(
+        'select * from product where name = ? and color = ? order by size',
+        [name, color]);
     return queryResult.map((e) => Product.fromMap(e)).toList();
   }
 
@@ -594,5 +595,34 @@ class DatabaseHandler {
     }
 
     return totalSales;
+  }
+
+  Future<List<Customer>> quaryCustomer() async {
+    final Database db = await initializeDB();
+    final List<Map<String, Object?>> queryResult =
+        await db.rawQuery('select * from customer');
+    return queryResult.map((e) => Customer.fromMap(e)).toList();
+  }
+
+  Future<int> updateCustomerProfile(
+      String id, String name, String phone) async {
+    final Database db = await initializeDB();
+    return await db.rawUpdate("""
+        UPDATE customer SET name = ?, phone = ? WHERE id = ?
+      """, [name, phone, id]);
+  }
+
+  Future<int> updateCustomerPassword(String id, String password) async {
+    final Database db = await initializeDB();
+    return await db.rawUpdate("""
+        UPDATE customer SET password = ? WHERE id = ?
+      """, [password, id]);
+  }
+
+  Future<List<Product>> quaryProductColor(String name) async {
+    final Database db = await initializeDB();
+    final List<Map<String, Object?>> queryResult = await db
+        .rawQuery('select * from product where name = ? order by size', [name]);
+    return queryResult.map((e) => Product.fromMap(e)).toList();
   }
 } // End 
